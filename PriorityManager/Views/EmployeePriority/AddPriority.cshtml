@@ -1,0 +1,122 @@
+﻿@model PriorityManager.ViewModels.EmployeePriority
+
+@{
+    ViewBag.Title = "Add Priority";
+}
+<script src="@Url.Content("~/Scripts/jquery-1.12.3.js")"></script>
+<script src="@Url.Content("~/Scripts/jquery-ui.js")"></script>
+<link rel="stylesheet" href="@Url.Content("~/Styles/jquery-ui.css")"></link>
+<link rel="stylesheet" href="@Url.Content("~/Styles/theme.css")"></link>
+<style type="text/css">
+
+.hide
+{
+    display:none;   
+}
+
+</style>
+
+<script type="text/javascript">
+    var empId = "";
+    $(document).ready(function()
+    {
+        $('#EmployeeID').val('@ViewBag.EmployeeID');
+        $('#EmployeeName').val('@ViewBag.EmployeeName');
+        $('#Priority').val('@ViewBag.Priority');
+        $('#EmployeeName').prop('readonly', true);
+        $('#Priority').prop('readonly', true);
+        var empId = $('#EmployeeID').val();
+        $("#back").attr("href", "/EmployeePriority/DisplayPriority?empId=" + empId);
+        $("#DevDueDate").datepicker({
+            showOn: "button",
+            buttonImage: "../images/calendar.gif",
+            buttonImageOnly: true,
+            buttonText: "Select date",
+            changeMonth: true,
+            changeYear: true
+        });
+        $("#QADueDate").datepicker({
+            showOn: "button",
+            buttonImage: "../images/calendar.gif",
+            buttonImageOnly: true,
+            buttonText: "Select date",
+            changeMonth: true,
+            changeYear: true
+        });
+    });
+
+</script>
+
+<h2>Add Priority</h2>
+
+@using (Html.BeginForm()) {
+    @Html.ValidationSummary(true)
+
+    <fieldset>
+        <legend>Add Priority</legend>
+
+        <div>
+            <table>
+                <tr class="hide">
+                    <td>Employee ID</td>
+                    <td>
+                        @Html.EditorFor(model => model.EmployeeID)
+                    </td>
+                </tr>
+                <tr>
+                    <td>Employee Name</td>
+                    <td>
+                        @Html.EditorFor(model => model.EmployeeName)
+                        @Html.ValidationMessageFor(model => model.EmployeeName)
+                    </td>
+                </tr>
+                <tr>
+                    <td>Issue #</td>
+                    <td>
+                        @Html.EditorFor(model => model.IssueNumber)
+                        @Html.ValidationMessageFor(model => model.IssueNumber)
+                    </td>
+                </tr>
+                <tr>
+                    <td>Subject</td>
+                    <td>
+                        @Html.EditorFor(model => model.IssueSubject)
+                        @Html.ValidationMessageFor(model => model.IssueSubject)
+                    </td>
+                </tr>
+                <tr>
+                    <td>Dev Due Date</td>
+                    <td>
+                        @Html.EditorFor(model => model.DevDueDate)
+                        @Html.ValidationMessageFor(model => model.DevDueDate)
+                    </td>
+                </tr>
+                <tr>
+                    <td>QA Due Date</td>
+                    <td>
+                        @Html.EditorFor(model => model.QADueDate)
+                        @Html.ValidationMessageFor(model => model.QADueDate)
+                    </td>
+                </tr>
+                <tr>
+                    <td>Priority</td>
+                    <td>
+                        @Html.EditorFor(model => model.Priority)
+                        @Html.ValidationMessageFor(model => model.Priority)
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <input type="submit" value="Create" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </fieldset>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "DisplayPriority", null, new { id = "back" })
+</div>
+
+

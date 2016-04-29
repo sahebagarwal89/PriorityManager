@@ -1,0 +1,431 @@
+﻿@{
+    ViewBag.Title = "Display Priority";
+}
+
+
+<script src="@Url.Content("~/Scripts/jquery-1.12.3.js")"></script>
+<script src="@Url.Content("~/Scripts/jquery.dataTables.js")"></script>
+<script src="@Url.Content("~/Scripts/jquery.unobtrusive-ajax.min.js")"></script>
+<link rel="stylesheet" href="@Url.Content("~/Styles/jquery.dataTables.css")"></link>
+<link rel="stylesheet" href="@Url.Content("~/Styles/theme.css")"></link>
+
+<style type="text/css">
+
+th
+{
+    text-align:left;   
+}
+
+a.editbutton
+{
+    background: url(../images/edit_16.png) no-repeat top left;
+    display: block;
+    width:16px;
+    height:16px;
+    text-indent: -9999px; /* hides the link text */
+}
+
+a.addbutton
+{
+    background: url(../images/addPriority.png) no-repeat top left;
+    display: block;
+    width:24px;
+    height:24px;
+    text-indent: -9999px; /* hides the link text */
+}
+
+.deletebutton
+{
+    background: url(../images/delete_16.png) no-repeat top left;
+    display: block;
+    cursor:pointer;
+    width:16px;
+    height:16px;
+}
+
+.upArrow
+{
+    background: url(../images/uparrow_16.png) no-repeat top left;
+    display: block;
+    cursor:pointer;
+    width:16px;
+    height:16px;
+}
+
+.downArrow
+{
+    background: url(../images/downarrow_16.png) no-repeat top left;
+    display: block;
+    cursor:pointer;
+    width:16px;
+    height:16px;
+}
+
+.disableupArrow
+{
+    background: url(../images/uparrow_16_disabled.png) no-repeat top left;
+    display: block;
+    cursor:pointer;
+    width:16px;
+    height:16px;
+}
+
+.disabledownArrow
+{
+    background: url(../images/downarrow_16_disabled.png) no-repeat top left;
+    display: block;
+    cursor:pointer;
+    width:16px;
+    height:16px;
+}
+
+.disabledaddbutton 
+{
+    background: url(../images/addPriority.png) no-repeat top left;
+    display: block;
+    width:24px;
+    height:24px;
+    text-indent: -9999px; /* hides the link text */
+    pointer-events: none;
+    opacity: 0.3;
+}
+
+</style>
+
+<script type="text/javascript">
+    //var baseURL="";
+    //This block will be executed when the page is loaded. If employee id is passed it will display the priority for that employee in the grid.
+    $(document).ready(function ()
+    {
+        //baseURL= '@System.Configuration.ConfigurationManager.AppSettings["baseURL"]';
+        var empId='@ViewBag.SelectedEmployee';
+        if (empId == "")
+        {
+            clearDataTable();
+        }
+        else
+        {
+            $('#Employees').val(empId);
+            getEmployeePriority(empId);
+        }
+    });
+
+    function clearDataTable()
+    {
+        $('#tblEmpPriority').DataTable({
+                destroy: true,
+                scrollY:250,
+                columns: [
+                            { "searchable": false,
+                              "sortable": false,
+                              "width": "150px"
+                            },
+                            { "searchable": false,
+                              "sortable": false
+                            },
+                            { "searchable": false,
+                              "sortable": false
+                            },
+                            { "searchable": false,
+                              "sortable": false,
+                            },
+                            { "searchable": false,
+                              "sortable": false
+                            },
+                            { "searchable": false,
+                              "sortable": false
+                            },
+                            {
+                               "searchable": false,
+                               "sortable": false
+                            },
+                            {
+                               "searchable": false,
+                               "sortable": false
+                            },
+                            {
+                               "searchable": false,
+                               "sortable": false
+                            },
+                            {
+                               "searchable": false,
+                               "sortable": false
+                            }
+                    ]
+           });
+    }
+
+    //This function is executed when we select a employee from dropdown to populate the priority list.
+    function getEmployeePriority(empId)
+    {
+        //+ if no employee is selected Add Priority icon will be disabled. 
+        if ((empId == "") || (empId == -1))
+        {
+            $('#addPriority').prop("class", "disabledaddbutton");
+            empId = (empId == "")? 0 : empId;
+        }
+        else
+        {
+            $('#addPriority').prop("class", "addbutton");
+            $('#addPriority').attr("href", "/EmployeePriority/AddPriority?empId=" + empId);
+        }
+        
+        //- if no employee is selected Add Priority icon will be disabled.
+        $.ajax({
+            type: "POST",
+            url: "/EmployeePriority/GetEmployeePriority",
+            data: { 'empId': empId },
+            dataType: "json",
+            success: successFunc,
+            error: errorFunc
+        });
+    }
+
+    //function to delete the record from Priority list
+    function deleteEmployeePriority(empid, PID)
+    {
+        if (confirm('Are you sure you want to delete this priority?')) 
+        {  
+            $.ajax({
+                type: "POST",
+                url: "/EmployeePriority/DeleteEmployeePriority",
+                data: { 'empId': empid , 'PID' : PID },
+                dataType: "json",
+                success: successFunc,
+                error: errorFunc
+            });
+        }
+    }
+
+    //Then down arrow is clicked this function will be executed to swap the priority with the record below 
+    //the current record(for which down arrow is pressed).
+    function decreasePriority(_this, empid, currPriority)
+    {
+        var nextRowIndex = $(_this).parent().parent().index() + 2;
+        var nextRow = $('#tblEmpPriority tr').eq(nextRowIndex);
+        var nextPriority=nextRow.children('td').eq(1).text();
+        $.ajax({
+                type: "POST",
+                url: "/EmployeePriority/SwapEmployeePriority",
+                data: { 'empId': empid , 'firstPriority' : currPriority, 'secondPriority' : nextPriority},
+                dataType: "json",
+                success: successFunc,
+                error: errorFunc
+            });
+    }
+
+    //Then up arrow is clicked this function will be executed to swap the priority with the record above 
+    //the current record(for which up arrow is pressed).
+    function increasePriority(_this, empid, currPriority)
+    {
+        var prevRowIndex = $(_this).parent().parent().index();
+        var prevRow = $('#tblEmpPriority tr').eq(prevRowIndex);
+        var prevPriority=prevRow.children('td').eq(1).text();
+        $.ajax({
+                type: "POST",
+                url: "/EmployeePriority/SwapEmployeePriority",
+                data: { 'empId': empid , 'firstPriority' : currPriority, 'secondPriority' : prevPriority},
+                dataType: "json",
+                success: successFunc,
+                error: errorFunc
+            });
+    }
+
+    //This function will be executed to render the content in the grid.
+    function successFunc(data, status)
+    {
+        data = JSON.parse(data);
+        var totalPriority=data.length;
+        var counter=0;
+        var sortedCol = $('#tblEmpPriority').dataTable().fnSettings().aaSorting[0][0];
+        var sortedDir = $('#tblEmpPriority').dataTable().fnSettings().aaSorting[0][1];
+        $('#tblEmpPriority').DataTable(
+        {
+            destroy: true,
+            data: data,
+            scrollY:250,
+            fnDrawCallback: redrawPriorityButton,
+            aaSorting : [[sortedCol, sortedDir]],
+            columns: [
+                {  "data": "EMPNAME",
+                   "width": "150px"
+                },
+                {  "data": "PRIORITY"},
+                {  "data": "ISSUENO",
+                    "render": function (issueno)
+                    {
+                        var result = '<a target="_blank" href="https://development.atlasdev.com/Issue_View.asp?IssueNbr=' + issueno + '">'+ issueno +'</a>';
+                        return result;
+                    }
+                
+                },
+                {  "data": "SUBJECT" },
+                {  "data": "DEVDUEDATE",
+                    "render": function (devdue)
+                    {
+                        var date = new Date(devdue);
+                        devdue = date.getMonth() + "/" + date.getDate() + "/" + date.getFullYear();
+                        return devdue;
+                    },
+                    "searchable":false,
+                    "sortable":true
+
+                },
+                {  "data": "QADUEDATE",
+                    "render": function (qadue)
+                    {
+                        var date = new Date(qadue);
+                        qadue = date.getMonth() + "/" + date.getDate() + "/" + date.getFullYear();
+                        return qadue;
+                    },
+                    "searchable":false,
+                    "sortable":true
+                },
+                {  "data": "PRIORITY",
+                    "searchable":false,
+                    "sortable":false,
+                    "render": function (priority)
+                    {
+                        counter++;
+                        var empid = $('#Employees').val();
+                        if ((empid == "-1") ||(counter==totalPriority))
+                        {
+                            var result ='<span id="spnDownArrow_'+ empid + "_" + priority  + '" class="disabledownArrow"></span>';
+                        }
+                        else
+                        {
+                            var result ='<span title="Decrease Priority" id="spnDownArrow_'+ empid + "_" + priority  + '" onclick="decreasePriority(this,' + empid + "," + priority + ')" class="downArrow"></span>';
+                        }
+                        return result;
+                    }
+                },
+                {
+                    "data": "PRIORITY",
+                    "searchable": false,
+                    "sortable": false,
+                    "render": function (priority)
+                    {
+                        var empid = $('#Employees').val();
+                        if ((empid == "-1") || (counter==1))
+                        {
+                            var result ='<span id="spnUpArrow_'+ empid + "_" + priority  + '" class="disableupArrow"></span>';
+                        }
+                        else
+                        {
+                            var result ='<span title="Increase Priority" id="spnUpArrow_'+ empid + "_" + priority  + '" onclick="increasePriority(this,' + empid + "," + priority + ')" class="upArrow"></span>';
+                        }
+                        
+                        return result;
+                    }
+                },
+                {
+                    "data": "PID",
+                    "searchable": false,
+                    "sortable": false,
+                    "render": function (PID)
+                    {
+                        var empid = $('#Employees').val();
+                        var result = '@Html.ActionLink("Edit", "EditPriority", "EmployeePriority", new { @empId = "editempid", @PID = "editPID" }, new{@class="editbutton", title="Edit Priority"})';
+                        result = result.replace('editempid', empid);
+                        result = result.replace("editPID", PID);
+                        return result;
+                    }
+                },
+                {
+                    "data": "PID",
+                    "searchable": false,
+                    "sortable": false,
+                    "render": function (PID)
+                    {
+                        var empid = $('#Employees').val();
+                        var result ='<span title="Delete Priority" id="spnDelEmpPriority_'+ PID  + '" onclick="deleteEmployeePriority(' + empid + "," + PID + ')" class="deletebutton"></span>';
+                        return result;
+                    }
+                },
+          ]
+        });
+        //setFirstRow();
+        //setLastRow();
+    }
+
+    //This function will be executed if there is an error while retriving employee details
+    function errorFunc()
+    {
+        alert('error');
+    }
+
+    //This function will be executed whenever the grid data is changed or sorting column is changed to enable/disable priority arrows.
+    function redrawPriorityButton()
+    {
+        var empid = $('#Employees').val();
+        var totalRows = $("#tblEmpPriority > tbody > tr").length;
+        for (var index=1;index<=totalRows;index++)
+        {
+            var row = $('#tblEmpPriority tr').eq(index);
+            var priority = row.children('td').eq(1).text();
+            var downArrowtd=row.children('td').eq(6);
+            var upArrowtd=row.children('td').eq(7);
+            var spnUpArrow="";
+            var spnDownArrow ="";
+            if ((empid == "-1") || (totalRows==1))
+            {
+                spnUpArrow ='<span id="spnUpArrow_'+ empid + "_" + priority  + '" class="disableupArrow"></span>';
+                spnDownArrow ='<span id="spnDownArrow_'+ empid + "_" + priority  + '" class="disabledownArrow"></span>';
+            }
+            else
+            {
+                if (index==1)
+                {
+                    spnUpArrow ='<span id="spnUpArrow_'+ empid + "_" + priority  + '" class="disableupArrow"></span>';
+                    spnDownArrow ='<span title="Decrease Priority" id="spnDownArrow_'+ empid + "_" + priority  + '" onclick="decreasePriority(this,' + empid + "," + priority + ')" class="downArrow"></span>';
+                }
+                else if (index==totalRows)
+                {
+                    spnUpArrow ='<span title="Increase Priority" id="spnUpArrow_'+ empid + "_" + priority  + '" onclick="increasePriority(this,' + empid + "," + priority + ')" class="upArrow"></span>';
+                    spnDownArrow ='<span id="spnDownArrow_'+ empid + "_" + priority  + '" class="disabledownArrow"></span>';
+                }
+                else
+                {
+                    spnUpArrow ='<span title="Increase Priority" id="spnUpArrow_'+ empid + "_" + priority  + '" onclick="increasePriority(this,' + empid + "," + priority + ')" class="upArrow"></span>';
+                    spnDownArrow ='<span title="Decrease Priority" id="spnDownArrow_'+ empid + "_" + priority  + '" onclick="decreasePriority(this,' + empid + "," + priority + ')" class="downArrow"></span>';
+                }
+            }
+            downArrowtd.empty();
+            upArrowtd.empty();
+            downArrowtd.html(spnDownArrow);
+            upArrowtd.html(spnUpArrow);
+         }
+     }
+</script>
+
+<table>
+    <tr>
+        <td>
+            Employee Name : @Html.DropDownList("Employees", null, "Select an employee", new { onchange = "getEmployeePriority(this.value)" })
+        </td>
+        <td>
+            @Html.ActionLink("Add Priority", "AddPriority", null, new { @id = "addPriority", @class = "disabledaddbutton", title = "Add Priority" })
+        </td>
+
+    </tr>
+
+</table>
+<br /><br />
+<div style="border:1px solid;padding:5px;width:800px;">
+    <table id="tblEmpPriority" class="display">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Priority</th>
+                <th>Issue #</th>
+                <th>Subject</th>
+                <th>Dev Due Date</th>
+                <th>QA Due Date</th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+    </table>
+</div>
