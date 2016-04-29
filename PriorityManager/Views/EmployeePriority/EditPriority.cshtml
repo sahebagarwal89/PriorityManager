@@ -17,13 +17,10 @@
 </style>
 
 <script type="text/javascript">
-    var empId = "";
     $(document).ready(function ()
     {
         $('#EmployeeName').prop("readonly", true);
         $('#Priority').prop("readonly", true);
-        var empId = $('#SelectedEMPID').val();
-        $("#back").attr("href", "/EmployeePriority/DisplayPriority?empId=" + empId);
         $("#DevDueDate").datepicker({
             showOn: "button",
             buttonImage: "../images/calendar.gif",
@@ -120,7 +117,7 @@
 }
 
 <div>
-    @Html.ActionLink("Back to List", "DisplayPriority", null, new { id = "back" })
+    @Html.ActionLink("Back to List", "DisplayPriority","EmployeePriority", new { @empId = Model.SelectedEMPID },null)
 </div>
 
  

@@ -37,7 +37,7 @@ namespace PriorityManager.Controllers
                 lstEmployees.Add(new SelectListItem { Text = "All Employees", Value = "-1" });
             }
 
-            if (empId == null)
+            if ((empId == null) || ((empId != null) && (lstEmployees.Count > 0) && (empId == "-1")))
             {
                 bIsValidEmployee = true;
             }
@@ -112,11 +112,12 @@ namespace PriorityManager.Controllers
             {
                 return HttpNotFound();
             }
-            ViewBag.EmployeeID = empId;
-            ViewBag.EmployeeName = dtEmployee.Rows[0]["EMPNAME"].ToString();
+            EmployeePriority empPriority = new EmployeePriority();
+            empPriority.EmployeeID = empId;
+            empPriority.EmployeeName = dtEmployee.Rows[0]["EMPNAME"].ToString();
             string maxPriority = EmployeeDetails.GetEmployeeMaxPriority(empId);
-            ViewBag.Priority = ((maxPriority=="")? 1 : Convert.ToInt32(maxPriority) + 1).ToString();
-            return View();
+            empPriority.Priority = ((maxPriority == "") ? 1 : Convert.ToInt32(maxPriority) + 1).ToString();
+            return View(empPriority);
         }
 
         [HttpPost]

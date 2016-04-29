@@ -17,16 +17,13 @@
 </style>
 
 <script type="text/javascript">
-    var empId = "";
     $(document).ready(function()
     {
-        $('#EmployeeID').val('@ViewBag.EmployeeID');
-        $('#EmployeeName').val('@ViewBag.EmployeeName');
-        $('#Priority').val('@ViewBag.Priority');
+        //$('#EmployeeID').val('@ViewBag.EmployeeID');
+        //$('#EmployeeName').val('@ViewBag.EmployeeName');
+        //$('#Priority').val('@ViewBag.Priority');
         $('#EmployeeName').prop('readonly', true);
         $('#Priority').prop('readonly', true);
-        var empId = $('#EmployeeID').val();
-        $("#back").attr("href", "/EmployeePriority/DisplayPriority?empId=" + empId);
         $("#DevDueDate").datepicker({
             showOn: "button",
             buttonImage: "../images/calendar.gif",
@@ -116,7 +113,7 @@
 }
 
 <div>
-    @Html.ActionLink("Back to List", "DisplayPriority", null, new { id = "back" })
+    @Html.ActionLink("Back to List", "DisplayPriority", "EmployeePriority", new { @empId = Model.EmployeeID },null)
 </div>
 
 
