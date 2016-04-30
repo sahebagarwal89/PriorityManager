@@ -11,7 +11,7 @@ namespace PriorityManager.Controllers
         //
         // GET: /Error/
 
-        public ActionResult InvalidInput(string message)
+        public ActionResult ErrorMessage(string message)
         {
             ViewBag.ErrorMessage = message;
             return View("Error");

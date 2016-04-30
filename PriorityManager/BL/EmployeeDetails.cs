@@ -126,10 +126,13 @@ namespace PriorityManager.BL
 
         public static void UpdatePriorityDetails(EmployeePriority empPriority)
         {
-            //string commandText = "UPDATE PRIORITY SET ISSUENO='" + empPriority.IssueNumber + "', SUBJECT='" + empPriority.IssueSubject + "', DEVDUEDATE='" + empPriority.DevDueDate + "', QADUEDATE='" + empPriority.QADueDate+"'";
-            string commandText = "UPDATE PRIORITY SET ISSUENO=@issueno, SUBJECT=@subject, DEVDUEDATE=@devdue, QADUEDATE=@qadue";
+            string commandText = "UPDATE PRIORITY SET ISSUENO='" + empPriority.IssueNumber + "', SUBJECT='" + empPriority.IssueSubject + "', DEVDUEDATE='" + empPriority.DevDueDate + "', QADUEDATE='" + empPriority.QADueDate+"'";
             string whereClause = "";
             List<OleDbParameter> paramList = new List<OleDbParameter>();
+            empPriority.IssueNumber = (empPriority.IssueNumber == null) ? "" : empPriority.IssueNumber;
+            empPriority.IssueSubject = (empPriority.IssueSubject == null) ? "" : empPriority.IssueSubject;
+            empPriority.DevDueDate = (empPriority.DevDueDate == null) ? "" : empPriority.DevDueDate;
+            empPriority.QADueDate = (empPriority.QADueDate == null) ? "" : empPriority.QADueDate;
             paramList.Add(new OleDbParameter("@issueno", empPriority.IssueNumber));
             paramList.Add(new OleDbParameter("@subject", empPriority.IssueSubject));
             paramList.Add(new OleDbParameter("@devdue", empPriority.DevDueDate));

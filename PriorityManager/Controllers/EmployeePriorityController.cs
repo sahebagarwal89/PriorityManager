@@ -20,36 +20,36 @@ namespace PriorityManager.Controllers
 
         public ActionResult DisplayPriority(string empId)
         {
-            List<SelectListItem> lstEmployees = new List<SelectListItem>();
+            EmployeePriority empPriority = new EmployeePriority();
+            empPriority.lstEmployees = new List<SelectListItem>();
             DataTable dtEmployee = EmployeeDetails.GetEmployees(null);
             bool bIsValidEmployee = false;
             foreach (DataRow drEmp in dtEmployee.Rows)
             {
-                lstEmployees.Add(new SelectListItem { Text = drEmp["EMPNAME"].ToString(), Value = drEmp["EMPID"].ToString() });
+                empPriority.lstEmployees.Add(new SelectListItem { Text = drEmp["EMPNAME"].ToString(), Value = drEmp["EMPID"].ToString() });
                 if ((empId != null) && (empId == drEmp["EMPID"].ToString()))
                 {
                     bIsValidEmployee = true;
                 }
             }
 
-            if (lstEmployees.Count > 0)
+            if (empPriority.lstEmployees.Count > 0)
             {
-                lstEmployees.Add(new SelectListItem { Text = "All Employees", Value = "-1" });
+                empPriority.lstEmployees.Add(new SelectListItem { Text = "All Employees", Value = "-1" });
             }
 
-            if ((empId == null) || ((empId != null) && (lstEmployees.Count > 0) && (empId == "-1")))
+            if ((empId == null) || ((empId != null) && (empPriority.lstEmployees.Count > 0) && (empId == "-1")))
             {
                 bIsValidEmployee = true;
             }
 
             if (!bIsValidEmployee)
             {
-                return RedirectToAction("InvalidInput", "Error", new { message = "Employee Id is not valid!" });
+                return RedirectToAction("ErrorMessage", "Error", new { message = "Employee Id is not valid!" });
             }
 
-            ViewBag.Employees = lstEmployees;
-            ViewBag.SelectedEmployee = empId;
-            return View();
+            empPriority.SelectedEMPID = empId;
+            return View(empPriority);
         }
 
         public ActionResult GetEmployeePriority(string empId)

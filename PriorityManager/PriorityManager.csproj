@@ -16,6 +16,11 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>false</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -151,11 +156,111 @@
     <Content Include="Scripts\jquery-1.12.3.js" />
     <Content Include="Scripts\jquery-ui.js" />
     <Content Include="Scripts\jquery.dataTables.js" />
-    <Content Include="Scripts\jquery.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
+    <Content Include="Scripts\ui\jquery-ui.js" />
+    <Content Include="Scripts\ui\jquery.ui.accordion.js" />
+    <Content Include="Scripts\ui\jquery.ui.autocomplete.js" />
+    <Content Include="Scripts\ui\jquery.ui.button.js" />
+    <Content Include="Scripts\ui\jquery.ui.core.js" />
+    <Content Include="Scripts\ui\jquery.ui.datepicker.js" />
+    <Content Include="Scripts\ui\jquery.ui.dialog.js" />
+    <Content Include="Scripts\ui\jquery.ui.draggable.js" />
+    <Content Include="Scripts\ui\jquery.ui.droppable.js" />
+    <Content Include="Scripts\ui\jquery.ui.effect-blind.js" />
+    <Content Include="Scripts\ui\jquery.ui.effect-bounce.js" />
+    <Content Include="Scripts\ui\jquery.ui.effect-clip.js" />
+    <Content Include="Scripts\ui\jquery.ui.effect-drop.js" />
+    <Content Include="Scripts\ui\jquery.ui.effect-explode.js" />
+    <Content Include="Scripts\ui\jquery.ui.effect-fade.js" />
+    <Content Include="Scripts\ui\jquery.ui.effect-fold.js" />
+    <Content Include="Scripts\ui\jquery.ui.effect-highlight.js" />
+    <Content Include="Scripts\ui\jquery.ui.effect-pulsate.js" />
+    <Content Include="Scripts\ui\jquery.ui.effect-scale.js" />
+    <Content Include="Scripts\ui\jquery.ui.effect-shake.js" />
+    <Content Include="Scripts\ui\jquery.ui.effect-slide.js" />
+    <Content Include="Scripts\ui\jquery.ui.effect-transfer.js" />
+    <Content Include="Scripts\ui\jquery.ui.effect.js" />
+    <Content Include="Scripts\ui\jquery.ui.menu.js" />
+    <Content Include="Scripts\ui\jquery.ui.mouse.js" />
+    <Content Include="Scripts\ui\jquery.ui.position.js" />
+    <Content Include="Scripts\ui\jquery.ui.progressbar.js" />
+    <Content Include="Scripts\ui\jquery.ui.resizable.js" />
+    <Content Include="Scripts\ui\jquery.ui.selectable.js" />
+    <Content Include="Scripts\ui\jquery.ui.slider.js" />
+    <Content Include="Scripts\ui\jquery.ui.sortable.js" />
+    <Content Include="Scripts\ui\jquery.ui.spinner.js" />
+    <Content Include="Scripts\ui\jquery.ui.tabs.js" />
+    <Content Include="Scripts\ui\jquery.ui.tooltip.js" />
+    <Content Include="Scripts\ui\jquery.ui.widget.js" />
+    <Content Include="Styles\demos\demos.css" />
     <Content Include="Styles\jquery-ui.css" />
     <Content Include="Styles\theme.css" />
     <Content Include="Styles\jquery.dataTables.css" />
+    <Content Include="Styles\themes\base\images\animated-overlay.gif" />
+    <Content Include="Styles\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
+    <Content Include="Styles\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
+    <Content Include="Styles\themes\base\images\ui-bg_glass_55_fbf9ee_1x400.png" />
+    <Content Include="Styles\themes\base\images\ui-bg_glass_65_ffffff_1x400.png" />
+    <Content Include="Styles\themes\base\images\ui-bg_glass_75_dadada_1x400.png" />
+    <Content Include="Styles\themes\base\images\ui-bg_glass_75_e6e6e6_1x400.png" />
+    <Content Include="Styles\themes\base\images\ui-bg_glass_95_fef1ec_1x400.png" />
+    <Content Include="Styles\themes\base\images\ui-bg_highlight-soft_75_cccccc_1x100.png" />
+    <Content Include="Styles\themes\base\images\ui-icons_222222_256x240.png" />
+    <Content Include="Styles\themes\base\images\ui-icons_2e83ff_256x240.png" />
+    <Content Include="Styles\themes\base\images\ui-icons_454545_256x240.png" />
+    <Content Include="Styles\themes\base\images\ui-icons_888888_256x240.png" />
+    <Content Include="Styles\themes\base\images\ui-icons_cd0a0a_256x240.png" />
+    <Content Include="Styles\themes\base\jquery-ui.css" />
+    <Content Include="Styles\themes\base\jquery.ui.accordion.css" />
+    <Content Include="Styles\themes\base\jquery.ui.all.css" />
+    <Content Include="Styles\themes\base\jquery.ui.autocomplete.css" />
+    <Content Include="Styles\themes\base\jquery.ui.base.css" />
+    <Content Include="Styles\themes\base\jquery.ui.button.css" />
+    <Content Include="Styles\themes\base\jquery.ui.core.css" />
+    <Content Include="Styles\themes\base\jquery.ui.datepicker.css" />
+    <Content Include="Styles\themes\base\jquery.ui.dialog.css" />
+    <Content Include="Styles\themes\base\jquery.ui.menu.css" />
+    <Content Include="Styles\themes\base\jquery.ui.progressbar.css" />
+    <Content Include="Styles\themes\base\jquery.ui.resizable.css" />
+    <Content Include="Styles\themes\base\jquery.ui.selectable.css" />
+    <Content Include="Styles\themes\base\jquery.ui.slider.css" />
+    <Content Include="Styles\themes\base\jquery.ui.spinner.css" />
+    <Content Include="Styles\themes\base\jquery.ui.tabs.css" />
+    <Content Include="Styles\themes\base\jquery.ui.theme.css" />
+    <Content Include="Styles\themes\base\jquery.ui.tooltip.css" />
+    <Content Include="Styles\themes\ui-lightness\images\animated-overlay.gif" />
+    <Content Include="Styles\themes\ui-lightness\images\ui-bg_diagonals-thick_18_b81900_40x40.png" />
+    <Content Include="Styles\themes\ui-lightness\images\ui-bg_diagonals-thick_20_666666_40x40.png" />
+    <Content Include="Styles\themes\ui-lightness\images\ui-bg_flat_10_000000_40x100.png" />
+    <Content Include="Styles\themes\ui-lightness\images\ui-bg_glass_100_f6f6f6_1x400.png" />
+    <Content Include="Styles\themes\ui-lightness\images\ui-bg_glass_100_fdf5ce_1x400.png" />
+    <Content Include="Styles\themes\ui-lightness\images\ui-bg_glass_65_ffffff_1x400.png" />
+    <Content Include="Styles\themes\ui-lightness\images\ui-bg_gloss-wave_35_f6a828_500x100.png" />
+    <Content Include="Styles\themes\ui-lightness\images\ui-bg_highlight-soft_100_eeeeee_1x100.png" />
+    <Content Include="Styles\themes\ui-lightness\images\ui-bg_highlight-soft_75_ffe45c_1x100.png" />
+    <Content Include="Styles\themes\ui-lightness\images\ui-icons_222222_256x240.png" />
+    <Content Include="Styles\themes\ui-lightness\images\ui-icons_228ef1_256x240.png" />
+    <Content Include="Styles\themes\ui-lightness\images\ui-icons_ef8c08_256x240.png" />
+    <Content Include="Styles\themes\ui-lightness\images\ui-icons_ffd27a_256x240.png" />
+    <Content Include="Styles\themes\ui-lightness\images\ui-icons_ffffff_256x240.png" />
+    <Content Include="Styles\themes\ui-lightness\jquery-ui.css" />
+    <Content Include="Styles\themes\ui-lightness\jquery.ui.accordion.css" />
+    <Content Include="Styles\themes\ui-lightness\jquery.ui.all.css" />
+    <Content Include="Styles\themes\ui-lightness\jquery.ui.autocomplete.css" />
+    <Content Include="Styles\themes\ui-lightness\jquery.ui.base.css" />
+    <Content Include="Styles\themes\ui-lightness\jquery.ui.button.css" />
+    <Content Include="Styles\themes\ui-lightness\jquery.ui.core.css" />
+    <Content Include="Styles\themes\ui-lightness\jquery.ui.datepicker.css" />
+    <Content Include="Styles\themes\ui-lightness\jquery.ui.dialog.css" />
+    <Content Include="Styles\themes\ui-lightness\jquery.ui.menu.css" />
+    <Content Include="Styles\themes\ui-lightness\jquery.ui.progressbar.css" />
+    <Content Include="Styles\themes\ui-lightness\jquery.ui.resizable.css" />
+    <Content Include="Styles\themes\ui-lightness\jquery.ui.selectable.css" />
+    <Content Include="Styles\themes\ui-lightness\jquery.ui.slider.css" />
+    <Content Include="Styles\themes\ui-lightness\jquery.ui.spinner.css" />
+    <Content Include="Styles\themes\ui-lightness\jquery.ui.tabs.css" />
+    <Content Include="Styles\themes\ui-lightness\jquery.ui.theme.css" />
+    <Content Include="Styles\themes\ui-lightness\jquery.ui.tooltip.css" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
