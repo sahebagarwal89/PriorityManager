@@ -30,7 +30,7 @@ namespace PriorityManager.BL
 
         public static DataTable GetEmployeePriority(string empId)
         {
-            string commandText = "SELECT EMPNAME,PID,PRIORITY,ISSUENO,SUBJECT,DEVDUEDATE,QADUEDATE FROM EMPLOYEES, PRIORITY";
+            string commandText = "SELECT EMPNAME,PID,PRIORITY,ISSUENO,SUBJECT,STATUS,DEVDUEDATE,QADUEDATE FROM EMPLOYEES, PRIORITY";
             string whereClause = " WHERE EMPLOYEES.EMPID=PRIORITY.EMPID";
             string orderBy = "";
             List<OleDbParameter> paramList = new List<OleDbParameter>();
@@ -51,7 +51,7 @@ namespace PriorityManager.BL
 
         public static DataTable GetEmployeePriorityById(string PID)
         {
-            string commandText = "SELECT EMPLOYEES.EMPID,EMPNAME,PRIORITY,ISSUENO,SUBJECT,DEVDUEDATE,QADUEDATE FROM EMPLOYEES, PRIORITY";
+            string commandText = "SELECT EMPLOYEES.EMPID,EMPNAME,PRIORITY,ISSUENO,SUBJECT,STATUS,DEVDUEDATE,QADUEDATE,ENTEREDBY,ASSIGNEDBY,REASON FROM EMPLOYEES, PRIORITY";
             string whereClause = " WHERE EMPLOYEES.EMPID=PRIORITY.EMPID";
             string orderBy = "";
             List<OleDbParameter> paramList = new List<OleDbParameter>();
@@ -124,9 +124,28 @@ namespace PriorityManager.BL
             DAOEmployee.ExecuteDMLCommand(commandText, paramList);
         }
 
+        public static void UpdateEmployeesFollowingPriority(string empId, int priority)
+        {
+            string commandText = "UPDATE PRIORITY SET PRIORITY=PRIORITY-1";
+            string whereClause = "";
+            List<OleDbParameter> paramList = new List<OleDbParameter>();
+            if (empId != null)
+            {
+                whereClause += (whereClause == "") ? " WHERE EMPID=@empId" : " AND EMID=@empId";
+                paramList.Add(new OleDbParameter("@empId", empId));
+            }
+            if (priority > 0)
+            {
+                whereClause += (whereClause == "") ? " WHERE PRIORITY>@priority" : " AND PRIORITY>@priority";
+                paramList.Add(new OleDbParameter("@priority", priority));
+            }
+            commandText += whereClause;
+            DAOEmployee.ExecuteDMLCommand(commandText, paramList);
+        }
+
         public static void UpdatePriorityDetails(EmployeePriority empPriority)
         {
-            string commandText = "UPDATE PRIORITY SET ISSUENO='" + empPriority.IssueNumber + "', SUBJECT='" + empPriority.IssueSubject + "', DEVDUEDATE='" + empPriority.DevDueDate + "', QADUEDATE='" + empPriority.QADueDate+"'";
+            string commandText = "UPDATE PRIORITY SET ISSUENO=@issueno, SUBJECT=@subject, DEVDUEDATE=@devdue, QADUEDATE=@qadue";
             string whereClause = "";
             List<OleDbParameter> paramList = new List<OleDbParameter>();
             empPriority.IssueNumber = (empPriority.IssueNumber == null) ? "" : empPriority.IssueNumber;
@@ -151,7 +170,50 @@ namespace PriorityManager.BL
             DAOEmployee.ExecuteDMLCommand(commandText, paramList);
         }
 
-        public static EmployeePriority EditEmployeePriority(string PID)
+        public static void AssignEmployeePriority(string assignedBy, string assignTo, string pid, string status, string reason)
+        {
+            string commandText = "UPDATE PRIORITY SET EMPID=@empid, STATUS=@status, ASSIGNEDBY=@assignedby, REASON=@reason, PRIORITY=@priority";
+            string whereClause = "";
+            List<OleDbParameter> paramList = new List<OleDbParameter>();
+            paramList.Add(new OleDbParameter("@empid", assignTo));
+            paramList.Add(new OleDbParameter("@status", status));
+            paramList.Add(new OleDbParameter("@assignedby", assignedBy));
+            paramList.Add(new OleDbParameter("@reason", reason));
+            string strPriority = (GetEmployeeMaxPriority(assignTo));
+            int priority = (strPriority == "") ? 1 : (Convert.ToInt32(strPriority)+1);
+            paramList.Add(new OleDbParameter("@priority", priority));
+            if (pid != null)
+            {
+                whereClause += (whereClause == "") ? " WHERE PID=@pid" : " AND PID=@pid";
+                paramList.Add(new OleDbParameter("@pid", pid));
+            }
+            commandText += whereClause;
+            DAOEmployee.ExecuteDMLCommand(commandText, paramList);
+        }
+
+        public static EmployeePriority ViewEmployeePriority(string PID)
+        {
+            EmployeePriority empPriority = null;
+            DataTable dtPriority = GetEmployeePriorityById(PID);
+            if (dtPriority.Rows.Count > 0)
+            {
+                empPriority = new EmployeePriority();
+                empPriority.EmployeeID = dtPriority.Rows[0]["EMPID"].ToString(); ;
+                empPriority.EmployeeName = dtPriority.Rows[0]["EMPNAME"].ToString();
+                empPriority.IssueNumber = dtPriority.Rows[0]["ISSUENO"].ToString();
+                empPriority.IssueSubject = dtPriority.Rows[0]["SUBJECT"].ToString();
+                empPriority.Status = dtPriority.Rows[0]["STATUS"].ToString();
+                empPriority.DevDueDate = dtPriority.Rows[0]["DEVDUEDATE"].ToString().Split(' ')[0];
+                empPriority.QADueDate = dtPriority.Rows[0]["QADUEDATE"].ToString().Split(' ')[0];
+                empPriority.Priority = dtPriority.Rows[0]["PRIORITY"].ToString();
+                empPriority.EnteredBy = dtPriority.Rows[0]["ENTEREDBY"].ToString();
+                empPriority.AssignedBy = dtPriority.Rows[0]["ASSIGNEDBY"].ToString();
+                empPriority.Reason = dtPriority.Rows[0]["REASON"].ToString();
+            }
+            return empPriority;
+        }
+
+        /*public static EmployeePriority EditEmployeePriority(string PID)
         {
             EmployeePriority empPriority = null;
             DataTable dtPriority = GetEmployeePriorityById(PID);
@@ -167,7 +229,7 @@ namespace PriorityManager.BL
                 empPriority.Priority = dtPriority.Rows[0]["PRIORITY"].ToString();
             }
             return empPriority;
-        }
+        }*/
 
         public static void AddPriority(EmployeePriority empPriority)
         {

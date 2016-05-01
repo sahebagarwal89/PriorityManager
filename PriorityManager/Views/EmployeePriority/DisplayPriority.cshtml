@@ -39,6 +39,15 @@ a.editbutton
     text-indent: -9999px; /* hides the link text */
 }
 
+a.viewbutton
+{
+    background: url(../images/View.png) no-repeat top left;
+    display: block;
+    width:16px;
+    height:16px;
+    text-indent: -9999px; /* hides the link text */
+}
+
 a.addbutton
 {
     background: url(../images/addPriority.png) no-repeat top left;
@@ -51,6 +60,15 @@ a.addbutton
 .deletebutton
 {
     background: url(../images/delete_16.png) no-repeat top left;
+    display: block;
+    cursor:pointer;
+    width:16px;
+    height:16px;
+}
+
+.assignbutton
+{
+    background: url(../images/assignPriority.png) no-repeat top left;
     display: block;
     cursor:pointer;
     width:16px;
@@ -104,13 +122,36 @@ a.addbutton
     opacity: 0.3;
 }
 
+select,input,textarea{
+    width:250px;
+    border-radius:4px;
+}
+
+textarea{
+    height:140px;
+}
+
 </style>
 
 <script type="text/javascript">
+    var columns = { "EMPNAME": 0,
+                    "PRIORITY": 1,
+                    "ISSUENO": 2,
+                    "SUBJECT": 3,
+                    "STATUS": 4,
+                    "DEVDUE": 5,
+                    "QADUE": 6,
+                    "VIEW": 7,
+                    "DECREASE": 8,
+                    "INCREASE": 9,
+                    "EDIT": 10,
+                    "ASSIGN": 11,
+                    "DELETE":12
+                  };
     //This block will be executed when the page is loaded. If employee id is passed it will display the priority for that employee in the grid.
     $(document).ready(function ()
     {
-        var empId = '@Model.SelectedEMPID'; 
+        var empId = '@Model.SelectedEMPID';
         if (empId == "")
         {
             clearDataTable();
@@ -120,6 +161,45 @@ a.addbutton
             $('#Employees').val(empId);
             getEmployeePriority(empId);
         }
+
+        $("#dlgAssignPriority").dialog({
+            autoOpen: false,
+            height: 380,
+            width: 400,
+            modal: true,
+            buttons: {
+                "Assign": function () {
+                    var bValid = true;
+                    var assignTo = $('#AssignTo').val();
+                    if (assignTo == "")
+                    {
+                        bValid = false;
+                        $('#errorMessage').text("Please select an employee to assign priority!");
+                    }
+                    if (bValid)
+                    {
+                        var empId = $("#Employees").val();
+                        var pid = $("#txtAssignPID").val();
+                        var status = $("#txtAssignStatus").val();
+                        var reason = $("#txtAssignReason").val();
+                        $.ajax({
+                            type: "POST",
+                            url: "/EmployeePriority/AssignPriority",
+                            data: { 'empId': empId, 'assignedBy': 'test', 'assignTo': assignTo, 'pid': pid, 'status': status, 'reason': reason },
+                            dataType: "json",
+                            success: successFunc,
+                            error: errorFunc
+                        });
+                        $(this).dialog("close");
+                    }
+
+                },
+                Cancel: function () {
+                    $(this).dialog("close");
+                }
+            }
+
+        });
     });
 
     function clearDataTable()
@@ -163,6 +243,18 @@ a.addbutton
                             {
                                "searchable": false,
                                "sortable": false
+                            },
+                            {
+                                "searchable": false,
+                                "sortable": false
+                            },
+                            {
+                                "searchable": false,
+                                "sortable": false
+                            },
+                            {
+                                "searchable": false,
+                                "sortable": false
                             }
                     ]
            });
@@ -171,7 +263,8 @@ a.addbutton
     //This function is executed when we select a employee from dropdown to populate the priority list.
     function getEmployeePriority(empId)
     {
-        //+ if no employee is selected Add Priority icon will be disabled. 
+        //+ if no employee/all employees is selected Add Priority icon will be disabled.
+        @Model.SelectedEMPID=empId;
         if ((empId == "") || (empId == -1))
         {
             $('#addPriority').prop("class", "disabledaddbutton");
@@ -182,8 +275,8 @@ a.addbutton
             $('#addPriority').prop("class", "addbutton");
             $('#addPriority').attr("href", "/EmployeePriority/AddPriority?empId=" + empId);
         }
-        
-        //- if no employee is selected Add Priority icon will be disabled.
+
+        //- if no employee/all employees is selected Add Priority icon will be disabled.
         $.ajax({
             type: "POST",
             url: "/EmployeePriority/GetEmployeePriority",
@@ -219,13 +312,13 @@ a.addbutton
         });
     }
 
-    //Then down arrow is clicked this function will be executed to swap the priority with the record below 
+    //Then down arrow is clicked this function will be executed to swap the priority with the record below
     //the current record(for which down arrow is pressed).
     function decreasePriority(_this, empid, currPriority)
     {
         var nextRowIndex = $(_this).parent().parent().index() + 2;
         var nextRow = $('#tblEmpPriority tr').eq(nextRowIndex);
-        var nextPriority=nextRow.children('td').eq(1).text();
+        var nextPriority=nextRow.children('td').eq(columns.PRIORITY).text();
         $.ajax({
                 type: "POST",
                 url: "/EmployeePriority/SwapEmployeePriority",
@@ -236,13 +329,13 @@ a.addbutton
             });
     }
 
-    //Then up arrow is clicked this function will be executed to swap the priority with the record above 
+    //Then up arrow is clicked this function will be executed to swap the priority with the record above
     //the current record(for which up arrow is pressed).
     function increasePriority(_this, empid, currPriority)
     {
         var prevRowIndex = $(_this).parent().parent().index();
         var prevRow = $('#tblEmpPriority tr').eq(prevRowIndex);
-        var prevPriority=prevRow.children('td').eq(1).text();
+        var prevPriority=prevRow.children('td').eq(columns.PRIORITY).text();
         $.ajax({
                 type: "POST",
                 url: "/EmployeePriority/SwapEmployeePriority",
@@ -251,6 +344,26 @@ a.addbutton
                 success: successFunc,
                 error: errorFunc
             });
+    }
+
+    //This function will be called to open assignment dialog when we click on "Assign Priority" button.
+    function assignEmployeePriority(_this, PID)
+    {
+        var rowIndex = $(_this).parent().parent().index() + 1;
+        var currentRow = $('#tblEmpPriority tr').eq(rowIndex);
+        var assignedFrom = currentRow.children('td').eq(columns.EMPNAME).text();
+        var priority = currentRow.children('td').eq(columns.PRIORITY).text();
+        var issueNumber = currentRow.children('td').eq(columns.ISSUENO).text();
+        var issueStatus = currentRow.children('td').eq(columns.STATUS).text();
+        $("#txtAssignPID").val(PID);
+        $("#txtIssueNumber").val(issueNumber);
+        $("#txtPriority").val(priority);
+        $("#txtAssignFrom").val(assignedFrom);
+        $("#txtAssignStatus").val(issueStatus);
+        $('#AssignTo').val("")
+        $("#txtAssignReason").val("");
+        $("#errorMessage").text("");
+        $("#dlgAssignPriority").dialog("open");
     }
 
     //This function will be executed to render the content in the grid.
@@ -279,11 +392,14 @@ a.addbutton
                         var result = '<a target="_blank" href="https://development.atlasdev.com/Issue_View.asp?IssueNbr=' + issueno + '">'+ issueno +'</a>';
                         return result;
                     }
-                
+
                 },
                 {
                     "data": "SUBJECT",
                     "width": "150px"
+                },
+                {
+                    "data": "STATUS"
                 },
                 {  "data": "DEVDUEDATE",
                     "render": function (devdue)
@@ -305,6 +421,19 @@ a.addbutton
                     },
                     "searchable":false,
                     "sortable":true
+                },
+                {
+                    "data": "PID",
+                    "searchable": false,
+                    "sortable": false,
+                    "render": function (PID) {
+                        var empid = $('#Employees').val();
+                        var result = '@Html.ActionLink("View", "ViewPriority", "EmployeePriority", new { @empId = "viewempid", @PID = "viewPID" }, new{@class="viewbutton", title="View Priority"})';
+                        result = result.replace('viewempid', empid);
+                        result = result.replace("viewPID", PID);
+                        return result;
+                    }
+
                 },
                 {  "data": "PRIORITY",
                     "searchable":false,
@@ -339,7 +468,7 @@ a.addbutton
                         {
                             var result ='<span title="Increase Priority" id="spnUpArrow_'+ empid + "_" + priority  + '" onclick="increasePriority(this,' + empid + "," + priority + ')" class="upArrow"></span>';
                         }
-                        
+
                         return result;
                     }
                 },
@@ -367,6 +496,15 @@ a.addbutton
                         return result;
                     }
                 },
+                {
+                    "data": "PID",
+                    "searchable": false,
+                    "sortable": false,
+                    "render": function (PID) {
+                        var result = '<span title="Assign Priority" id="spnAssignEmpPriority_' + PID + '" onclick="assignEmployeePriority(this' + "," + PID + ')" class="assignbutton"></span>';
+                        return result;
+                    }
+                }
           ]
         });
     }
@@ -374,7 +512,14 @@ a.addbutton
     //This function will be executed if there is an error while retriving employee details
     function errorFunc()
     {
-        alert('error');
+        $("#dlgErrorMessage").dialog({
+            modal: true,
+            buttons: {
+                OK: function () {
+                    $(this).dialog("close");
+                }
+            }
+        });
     }
 
     //This function will be executed whenever the grid data is changed or sorting column is changed to enable/disable priority arrows.
@@ -385,9 +530,9 @@ a.addbutton
         for (var index=1;index<=totalRows;index++)
         {
             var row = $('#tblEmpPriority tr').eq(index);
-            var priority = row.children('td').eq(1).text();
-            var downArrowtd=row.children('td').eq(6);
-            var upArrowtd=row.children('td').eq(7);
+            var priority = row.children('td').eq(columns.PRIORITY).text();
+            var downArrowtd=row.children('td').eq(columns.DECREASE);
+            var upArrowtd=row.children('td').eq(columns.INCREASE);
             var spnUpArrow="";
             var spnDownArrow ="";
             if ((empid == "-1") || (totalRows==1))
@@ -434,7 +579,7 @@ a.addbutton
 
 </table>
 <br /><br />
-<div style="border:1px solid;padding:5px;width:800px;">
+<div style="border:1px solid;padding:5px;width:950px;">
     <table id="tblEmpPriority" class="display">
         <thead>
             <tr>
@@ -442,8 +587,11 @@ a.addbutton
                 <th>Priority</th>
                 <th>Issue #</th>
                 <th>Subject</th>
-                <th>Dev Due Date</th>
-                <th>QA Due Date</th>
+                <th>Status</th>
+                <th>Dev Due</th>
+                <th>QA Due</th>
+                <th></th>
+                <th></th>
                 <th></th>
                 <th></th>
                 <th></th>
@@ -454,4 +602,68 @@ a.addbutton
 </div>
 <div id="delete-confirm" title="Delete Priority?" style="display:none;">
     <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>These items will be permanently deleted and cannot be recovered. Are you sure?</p>
+</div>
+<div id="dlgAssignPriority" title="Assign Priority">
+    <table>
+        <tr style="display:none">
+            <td>
+                PID
+            </td>
+            <td>
+                <input type="text" name="txtAssignPID" id="txtAssignPID" class="text ui-widget-content ui-corner-all" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Issue Number
+            </td>
+            <td>
+                <input type="text" name="txtIssueNumber" id="txtIssueNumber" readonly="readonly" class="text ui-widget-content ui-corner-all" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Priority
+            </td>
+            <td>
+                <input type="text" name="txtPriority" id="txtPriority" readonly="readonly" class="text ui-widget-content ui-corner-all" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Assign From
+            </td>
+            <td>
+                <input type="text" name="txtAssignFrom" id="txtAssignFrom" readonly="readonly" class="text ui-widget-content ui-corner-all" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Assign To
+            </td>
+            <td>
+                @Html.DropDownList("AssignTo", Model.lstEmployees.Where(item=> item.Value != "-1"), "Select an employee" )
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Status
+            </td>
+            <td>
+                <input type="text" name="txtAssignStatus" id="txtAssignStatus" class="text ui-widget-content ui-corner-all" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+               Reason
+            </td>
+            <td>
+                <textarea name="txtAssignReason" id="txtAssignReason" class="text ui-widget-content ui-corner-all"></textarea>
+            </td>
+        </tr>
+    </table>
+    <p id="errorMessage" style="color:red;"></p>
+</div>
+<div id="dlgErrorMessage" title="Error" style="display:none;">
+    <p><span class="ui-icon ui-icon-notice" style="float:left; margin:0 7px 20px 0;"></span>Oops! Something went wrong.</p>
 </div>

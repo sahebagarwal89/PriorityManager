@@ -1,0 +1,125 @@
+﻿@model PriorityManager.ViewModels.EmployeePriority
+
+@{
+    ViewBag.Title = "View Priority";
+}
+<script src="@Url.Content("~/Scripts/jquery-1.12.3.js")"></script>
+<script src="@Url.Content("~/Scripts/ui/jquery-ui.js")"></script>
+<link rel="stylesheet" href="@Url.Content("~/Styles/jquery-ui.css")"></link>
+<link rel="stylesheet" href="@Url.Content("~/Styles/theme.css")"></link>
+<style type="text/css">
+    .hide {
+        display: none;
+    }
+
+    table,tr,td
+    {
+        padding:5px;
+        margin:5px;
+    }
+
+    .caption{
+        text-align:right;
+    }
+</style>
+
+<script type="text/javascript">
+    $(document).ready(function ()
+    {
+        $('#EmployeeName').prop("readonly", true);
+        $('#Priority').prop("readonly", true);
+    });
+
+</script>
+
+<h2>View Priority</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.ValidationSummary(true)
+
+    <fieldset>
+        <legend>ViewPriority</legend>
+        <div>
+            <table>
+                <tr class="hide">
+                    <td class="caption">@Html.LabelFor(model => model.SelectedEMPID)</td>
+                    <td>
+                        @Html.EditorFor(model => model.SelectedEMPID)
+                    </td>
+                </tr>
+                <tr class="hide">
+                    <td class="caption">@Html.LabelFor(model => model.EmployeeID)</td>
+                    <td>
+                        @Html.EditorFor(model => model.EmployeeID)
+                    </td>
+                </tr>
+                <tr>
+                    <td class="caption">@Html.LabelFor(model => model.EmployeeName)</td>
+                    <td>
+                        @Html.DisplayFor(model => model.EmployeeName)
+                    </td>
+                </tr>
+                <tr>
+                    <td class="caption">@Html.LabelFor(model => model.IssueNumber)</td>
+                    <td>
+                        @Html.DisplayFor(model => model.IssueNumber)
+                    </td>
+                </tr>
+                <tr>
+                    <td class="caption">@Html.LabelFor(model => model.IssueSubject)</td>
+                    <td>
+                        @Html.DisplayFor(model => model.IssueSubject)
+                    </td>
+                </tr>
+                <tr>
+                    <td class="caption">@Html.LabelFor(model => model.Status)</td>
+                    <td>
+                        @Html.DisplayFor(model => model.Status)
+                    </td>
+                </tr>
+                <tr>
+                    <td class="caption">@Html.LabelFor(model => model.EnteredBy)</td>
+                    <td>
+                        @Html.DisplayFor(model => model.EnteredBy)
+                    </td>
+                </tr>
+                <tr>
+                    <td class="caption">@Html.LabelFor(model => model.AssignedBy)</td>
+                    <td>
+                        @Html.DisplayFor(model => model.AssignedBy)
+                    </td>
+                </tr>
+                <tr>
+                    <td class="caption">@Html.LabelFor(model => model.DevDueDate)</td>
+                    <td>
+                        @Html.DisplayFor(model => model.DevDueDate)
+                    </td>
+                </tr>
+                <tr>
+                    <td class="caption">@Html.LabelFor(model => model.QADueDate)</td>
+                    <td>
+                        @Html.DisplayFor(model => model.QADueDate)
+                    </td>
+                </tr>
+                <tr>
+                    <td class="caption">@Html.LabelFor(model => model.Priority)</td>
+                    <td>
+                        @Html.DisplayFor(model => model.Priority)
+                    </td>
+                </tr>
+                <tr>
+                    <td class="caption">@Html.LabelFor(model => model.Reason)</td>
+                    <td>
+                        @Html.DisplayFor(model => model.Reason)
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </fieldset>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "DisplayPriority", "EmployeePriority", new { @empId = Model.SelectedEMPID }, null)
+</div>
+

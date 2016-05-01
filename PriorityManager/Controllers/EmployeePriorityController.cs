@@ -83,9 +83,20 @@ namespace PriorityManager.Controllers
             return Json(employeePriority, JsonRequestBehavior.AllowGet);
         }
 
+        public ActionResult ViewPriority(string empId, string PID)
+        {
+            EmployeePriority empPriority = EmployeeDetails.ViewEmployeePriority(PID);
+            if (empPriority == null)
+            {
+                return HttpNotFound();
+            }
+            empPriority.SelectedEMPID = empId;
+            return View(empPriority);
+        }
+
         public ActionResult EditPriority(string empId, string PID)
         {
-            EmployeePriority empPriority = EmployeeDetails.EditEmployeePriority(PID);
+            EmployeePriority empPriority = EmployeeDetails.ViewEmployeePriority(PID);
             if (empPriority == null)
             {
                 return HttpNotFound();
@@ -130,6 +141,16 @@ namespace PriorityManager.Controllers
             }
 
             return View(empPriority);
+        }
+
+        public ActionResult AssignPriority(string empId, string assignedBy, string assignTo, string pid, string status, string reason)
+        {
+            EmployeePriority empPriority = EmployeeDetails.ViewEmployeePriority(pid);
+            EmployeeDetails.AssignEmployeePriority(assignedBy, assignTo, pid, status,reason);
+            EmployeeDetails.UpdateEmployeesFollowingPriority(empPriority.EmployeeID, Convert.ToInt32(empPriority.Priority));
+            DataTable dtEmpPriority = EmployeeDetails.GetEmployeePriority(empId);
+            string employeePriority = EmployeeDetails.DataTableToJsonWithJavaScriptSerializer(dtEmpPriority);
+            return Json(employeePriority);
         }
     }
 }
