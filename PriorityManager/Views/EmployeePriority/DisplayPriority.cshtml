@@ -264,7 +264,6 @@ textarea{
     function getEmployeePriority(empId)
     {
         //+ if no employee/all employees is selected Add Priority icon will be disabled.
-        @Model.SelectedEMPID=empId;
         if ((empId == "") || (empId == -1))
         {
             $('#addPriority').prop("class", "disabledaddbutton");
@@ -642,7 +641,7 @@ textarea{
                 Assign To
             </td>
             <td>
-                @Html.DropDownList("AssignTo", Model.lstEmployees.Where(item=> item.Value != "-1"), "Select an employee" )
+                @Html.DropDownList("AssignTo", Model.lstEmployees.Where(item=> (item.Value != "-1")), "Select an employee" )
             </td>
         </tr>
         <tr>

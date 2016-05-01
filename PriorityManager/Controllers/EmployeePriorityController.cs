@@ -70,17 +70,13 @@ namespace PriorityManager.Controllers
             {
                 empId = null;
             }
-            DataTable dtEmpPriority = EmployeeDetails.GetEmployeePriority(empId);
-            string employeePriority = EmployeeDetails.DataTableToJsonWithJavaScriptSerializer(dtEmpPriority);
-            return Json(employeePriority,JsonRequestBehavior.AllowGet);
+            return GetEmployeePriority(empId);
         }
 
         public ActionResult SwapEmployeePriority(string empId, string firstPriority, string secondPriority)
         {
             EmployeeDetails.SwapEmployeePriority(empId, firstPriority, secondPriority);
-            DataTable dtEmpPriority = EmployeeDetails.GetEmployeePriority(empId);
-            string employeePriority = EmployeeDetails.DataTableToJsonWithJavaScriptSerializer(dtEmpPriority);
-            return Json(employeePriority, JsonRequestBehavior.AllowGet);
+            return GetEmployeePriority(empId);
         }
 
         public ActionResult ViewPriority(string empId, string PID)
@@ -148,9 +144,7 @@ namespace PriorityManager.Controllers
             EmployeePriority empPriority = EmployeeDetails.ViewEmployeePriority(pid);
             EmployeeDetails.AssignEmployeePriority(assignedBy, assignTo, pid, status,reason);
             EmployeeDetails.UpdateEmployeesFollowingPriority(empPriority.EmployeeID, Convert.ToInt32(empPriority.Priority));
-            DataTable dtEmpPriority = EmployeeDetails.GetEmployeePriority(empId);
-            string employeePriority = EmployeeDetails.DataTableToJsonWithJavaScriptSerializer(dtEmpPriority);
-            return Json(employeePriority);
+            return GetEmployeePriority(empId);
         }
     }
 }
