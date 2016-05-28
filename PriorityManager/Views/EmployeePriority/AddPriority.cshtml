@@ -19,6 +19,8 @@
 <script type="text/javascript">
     $(document).ready(function()
     {
+        $('#EnteredBy').val('@Session["empid"]');
+        $('#AssignedBy').val('@Session["empid"]');
         $('#EmployeeName').prop('readonly', true);
         $('#Priority').prop('readonly', true);
         $("#DevDueDate").datepicker({
@@ -43,7 +45,9 @@
 
 <h2>Add Priority</h2>
 
-@using (Html.BeginForm()) {
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
     @Html.ValidationSummary(true)
 
     <fieldset>
@@ -52,51 +56,79 @@
         <div>
             <table>
                 <tr class="hide">
-                    <td>Employee ID</td>
+                    <td>@Html.LabelFor(model => model.EmployeeID)</td>
                     <td>
                         @Html.EditorFor(model => model.EmployeeID)
                     </td>
                 </tr>
                 <tr>
-                    <td>Employee Name</td>
+                    <td>@Html.LabelFor(model => model.EmployeeName)</td>
                     <td>
                         @Html.EditorFor(model => model.EmployeeName)
                         @Html.ValidationMessageFor(model => model.EmployeeName)
                     </td>
                 </tr>
                 <tr>
-                    <td>Issue #</td>
+                    <td>@Html.LabelFor(model => model.IssueNumber)</td>
                     <td>
                         @Html.EditorFor(model => model.IssueNumber)
                         @Html.ValidationMessageFor(model => model.IssueNumber)
                     </td>
                 </tr>
                 <tr>
-                    <td>Subject</td>
+                    <td>@Html.LabelFor(model => model.IssueSubject)</td>
                     <td>
                         @Html.EditorFor(model => model.IssueSubject)
                         @Html.ValidationMessageFor(model => model.IssueSubject)
                     </td>
                 </tr>
                 <tr>
-                    <td>Dev Due Date</td>
+                    <td>@Html.LabelFor(model => model.Status)</td>
+                    <td>
+                        @Html.EditorFor(model => model.Status)
+                        @Html.ValidationMessageFor(model => model.Status)
+                    </td>
+                </tr>
+                <tr>
+                    <td>@Html.LabelFor(model => model.Completed)</td>
+                    <td>
+                        @Html.EditorFor(model => model.Completed)
+                        @Html.ValidationMessageFor(model => model.Completed)
+                    </td>
+                </tr>
+                <tr>
+                    <td>@Html.LabelFor(model => model.DevDueDate)</td>
                     <td>
                         @Html.EditorFor(model => model.DevDueDate)
                         @Html.ValidationMessageFor(model => model.DevDueDate)
                     </td>
                 </tr>
                 <tr>
-                    <td>QA Due Date</td>
+                    <td>@Html.LabelFor(model => model.QADueDate)</td>
                     <td>
                         @Html.EditorFor(model => model.QADueDate)
                         @Html.ValidationMessageFor(model => model.QADueDate)
                     </td>
                 </tr>
                 <tr>
-                    <td>Priority</td>
+                    <td>@Html.LabelFor(model => model.Priority)</td>
                     <td>
                         @Html.EditorFor(model => model.Priority)
                         @Html.ValidationMessageFor(model => model.Priority)
+                    </td>
+                </tr>
+                <tr class="hide">
+                    <td>@Html.LabelFor(model => model.EnteredBy)</td>
+                    <td>
+                        @Html.EditorFor(model => model.EnteredBy)
+                        @Html.ValidationMessageFor(model => model.EnteredBy)
+                    </td>
+                </tr>
+                <tr class="hide">
+                    <td>@Html.LabelFor(model => model.AssignedBy)</td>
+                    <td>
+                        @Html.EditorFor(model => model.AssignedBy)
+                        @Html.ValidationMessageFor(model => model.AssignedBy)
                     </td>
                 </tr>
                 <tr>

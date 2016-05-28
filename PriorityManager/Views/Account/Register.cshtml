@@ -1,0 +1,86 @@
+﻿@model PriorityManager.Models.RegisterModel
+
+@{
+    ViewBag.Title = "Register";
+}
+
+<h2>Register</h2>
+
+<section id="registrationForm">
+
+    @using (Html.BeginForm("Register", "Account", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true)
+
+        <fieldset>
+            <legend>Registration Form</legend>
+            @if (ViewBag.Message != null)
+            {
+                <p>@ViewBag.Message</p>
+            }
+            <div>
+                <table>
+                    <tr>
+                        <td>@Html.LabelFor(model => model.EMPID)</td>
+                        <td>
+                            @Html.TextBoxFor(model => model.EMPID)
+                            @Html.ValidationMessageFor(model => model.EMPID)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>@Html.LabelFor(model => model.FullName)</td>
+                        <td>
+                            @Html.TextBoxFor(model => model.FullName)
+                            @Html.ValidationMessageFor(model => model.FullName)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>@Html.LabelFor(model => model.UserName)</td>
+                        <td>
+                            @Html.TextBoxFor(model => model.UserName)
+                            @Html.ValidationMessageFor(model => model.UserName)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>@Html.LabelFor(model => model.EmailId)</td>
+                        <td>
+                            @Html.EditorFor(model => model.EmailId)
+                            @Html.ValidationMessageFor(model => model.EmailId)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>@Html.LabelFor(model => model.Password)</td>
+                        <td>
+                            @Html.PasswordFor(model => model.Password)
+                            @Html.ValidationMessageFor(model => model.Password)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>@Html.LabelFor(model => model.ConfirmPassword)</td>
+                        <td>
+                            @Html.PasswordFor(model => model.ConfirmPassword)
+                            @Html.ValidationMessageFor(model => model.ConfirmPassword)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>@Html.LabelFor(model => model.IsManager)</td>
+                        <td>
+                            @Html.RadioButtonFor(model => model.IsManager,"Yes") Yes
+                            @Html.RadioButtonFor(model => model.IsManager, "No", new {@checked="checked"}) No
+                        </td>
+                        
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <input type="submit" value="Register" />
+                        </td>
+
+                    </tr>
+                </table>
+            </div>
+
+
+        </fieldset>
+    }
+</section>

@@ -8,6 +8,8 @@ using System.Web.Script.Serialization;
 using PriorityManager.Models;
 using System.Data.OleDb;
 using PriorityManager.ViewModels;
+using System.IO;
+using System.Globalization;
 
 namespace PriorityManager.BL
 {
@@ -51,7 +53,7 @@ namespace PriorityManager.BL
 
         public static DataTable GetEmployeePriorityById(string PID)
         {
-            string commandText = "SELECT EMPLOYEES.EMPID,EMPNAME,PRIORITY,ISSUENO,SUBJECT,STATUS,DEVDUEDATE,QADUEDATE,ENTEREDBY,ASSIGNEDBY,REASON FROM EMPLOYEES, PRIORITY";
+            string commandText = "SELECT EMPLOYEES.EMPID,EMPNAME,PRIORITY,ISSUENO,SUBJECT,STATUS,COMPLETED,DEVDUEDATE,QADUEDATE,ENTEREDBY,ASSIGNEDBY,REASON FROM EMPLOYEES, PRIORITY";
             string whereClause = " WHERE EMPLOYEES.EMPID=PRIORITY.EMPID";
             string orderBy = "";
             List<OleDbParameter> paramList = new List<OleDbParameter>();
@@ -145,15 +147,19 @@ namespace PriorityManager.BL
 
         public static void UpdatePriorityDetails(EmployeePriority empPriority)
         {
-            string commandText = "UPDATE PRIORITY SET ISSUENO=@issueno, SUBJECT=@subject, DEVDUEDATE=@devdue, QADUEDATE=@qadue";
+            string commandText = "UPDATE PRIORITY SET ISSUENO=@issueno, SUBJECT=@subject, STATUS=@status, COMPLETED=@completed, DEVDUEDATE=@devdue, QADUEDATE=@qadue";
             string whereClause = "";
             List<OleDbParameter> paramList = new List<OleDbParameter>();
             empPriority.IssueNumber = (empPriority.IssueNumber == null) ? "" : empPriority.IssueNumber;
             empPriority.IssueSubject = (empPriority.IssueSubject == null) ? "" : empPriority.IssueSubject;
+            empPriority.Status = (empPriority.Status == null) ? "" : empPriority.Status;
+            empPriority.Completed = (empPriority.Completed == null) ? "0" : empPriority.Completed;
             empPriority.DevDueDate = (empPriority.DevDueDate == null) ? "" : empPriority.DevDueDate;
             empPriority.QADueDate = (empPriority.QADueDate == null) ? "" : empPriority.QADueDate;
             paramList.Add(new OleDbParameter("@issueno", empPriority.IssueNumber));
             paramList.Add(new OleDbParameter("@subject", empPriority.IssueSubject));
+            paramList.Add(new OleDbParameter("@status", empPriority.Status));
+            paramList.Add(new OleDbParameter("@completed", empPriority.Completed));
             paramList.Add(new OleDbParameter("@devdue", empPriority.DevDueDate));
             paramList.Add(new OleDbParameter("@qadue", empPriority.QADueDate));
             if (empPriority.EmployeeID != null)
@@ -203,14 +209,30 @@ namespace PriorityManager.BL
                 empPriority.IssueNumber = dtPriority.Rows[0]["ISSUENO"].ToString();
                 empPriority.IssueSubject = dtPriority.Rows[0]["SUBJECT"].ToString();
                 empPriority.Status = dtPriority.Rows[0]["STATUS"].ToString();
+                empPriority.Completed = dtPriority.Rows[0]["COMPLETED"].ToString();
                 empPriority.DevDueDate = dtPriority.Rows[0]["DEVDUEDATE"].ToString().Split(' ')[0];
                 empPriority.QADueDate = dtPriority.Rows[0]["QADUEDATE"].ToString().Split(' ')[0];
                 empPriority.Priority = dtPriority.Rows[0]["PRIORITY"].ToString();
-                empPriority.EnteredBy = dtPriority.Rows[0]["ENTEREDBY"].ToString();
-                empPriority.AssignedBy = dtPriority.Rows[0]["ASSIGNEDBY"].ToString();
                 empPriority.Reason = dtPriority.Rows[0]["REASON"].ToString();
+                empPriority.EnteredBy = GetEmployeeName(dtPriority.Rows[0]["ENTEREDBY"].ToString());
+                empPriority.AssignedBy = GetEmployeeName(dtPriority.Rows[0]["ASSIGNEDBY"].ToString());
             }
             return empPriority;
+        }
+
+        public static string GetEmployeeName(string empId)
+        {
+            string empName = "";
+            DataTable dtEmpName=null;
+            if ((empId != null) && (empId != ""))
+            {
+                dtEmpName = GetEmployees(empId);
+            }
+            if ((dtEmpName != null) && (dtEmpName.Rows.Count > 0))
+            {
+                empName = dtEmpName.Rows[0]["EMPNAME"].ToString();
+            }
+            return empName;
         }
 
         /*public static EmployeePriority EditEmployeePriority(string PID)
@@ -233,14 +255,21 @@ namespace PriorityManager.BL
 
         public static void AddPriority(EmployeePriority empPriority)
         {
-            string commandText = "INSERT INTO PRIORITY(EMPID,ISSUENO,SUBJECT,DEVDUEDATE,QADUEDATE,PRIORITY) VALUES(@empId, @issueno, @subject, @devdue, @qadue, @priority)";
+            string commandText = "INSERT INTO PRIORITY(EMPID,ISSUENO,SUBJECT,STATUS,COMPLETED,DEVDUEDATE,QADUEDATE,PRIORITY,ENTEREDBY,ASSIGNEDBY) VALUES(@empId,@issueno,@subject,@status,@completed,@devdue,@qadue,@priority,@enteredby,@assignedby)";
             List<OleDbParameter> paramList = new List<OleDbParameter>();
+            empPriority.Completed = (empPriority.Completed == null) ? "0" : empPriority.Completed;
+            empPriority.DevDueDate = (empPriority.DevDueDate == null) ? "" : empPriority.DevDueDate;
+            empPriority.QADueDate = (empPriority.QADueDate == null) ? "" : empPriority.QADueDate;
             paramList.Add(new OleDbParameter("@empId", empPriority.EmployeeID));
             paramList.Add(new OleDbParameter("@issueno", empPriority.IssueNumber));
             paramList.Add(new OleDbParameter("@subject", empPriority.IssueSubject));
+            paramList.Add(new OleDbParameter("@status", empPriority.Status));
+            paramList.Add(new OleDbParameter("@completed", empPriority.Completed));
             paramList.Add(new OleDbParameter("@devdue", empPriority.DevDueDate));
             paramList.Add(new OleDbParameter("@qadue", empPriority.QADueDate));
             paramList.Add(new OleDbParameter("@priority", empPriority.Priority));
+            paramList.Add(new OleDbParameter("@enteredby", empPriority.EnteredBy));
+            paramList.Add(new OleDbParameter("@assignedby", empPriority.AssignedBy));
             DAOEmployee.ExecuteDMLCommand(commandText, paramList);
         }
 
@@ -274,6 +303,212 @@ namespace PriorityManager.BL
                 parentRow.Add(childRow);
             }
             return jsSerializer.Serialize(parentRow);
+        }
+
+        public static bool UploadPriorityFile(HttpPostedFileBase file, string empId, ref string message, ref string summary, ref List<UploadSummaryReport> uploadSummaryReport)
+        {
+            uploadSummaryReport = new List<UploadSummaryReport>();
+            bool bUpload = true;
+            string missingFieldMessage = "Required Field(s) Missing : ";
+            string invalidFieldMessage = "Invalid Input(s) : ";
+            string rowmessage = "";
+            string missingFieldList = "";
+            string invalidFieldList = "";
+            bool bValidRow = true;
+            int recordRow = 0;
+            try
+            {
+                using (StreamReader reader = new StreamReader(file.InputStream))
+                {
+                    while (true)
+                    {
+                        missingFieldList = "";
+                        invalidFieldList = "";
+                        rowmessage = "";
+                        bValidRow = true;
+                        string line = reader.ReadLine();
+                        if (line == null)
+                        {
+                            break;
+                        }
+                        else if (line.Trim() == "")
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            UploadSummaryReport report = new UploadSummaryReport();
+                            recordRow++;
+                            string[] row = line.Trim().Split(',');
+                            EmployeePriority empPriority = new EmployeePriority();
+                            if ((row.Length >= 1) && (row[0].ToString() != ""))
+                            {
+                                empPriority.EmployeeID = row[0].ToString();
+                                if (GetEmployeeName(empPriority.EmployeeID)=="")
+                                {
+                                    bValidRow = false;
+                                    invalidFieldList += (invalidFieldList != "")? ", " : "";
+                                    invalidFieldList += "Employee ID";
+                                }                                
+                            }
+                            else
+                            {
+                                //required
+                                bValidRow = false;
+                                missingFieldList += (missingFieldList != "") ? ", " : "";
+                                missingFieldList += "Employee ID";
+                            }
+                            if ((row.Length >= 2) && (row[1].ToString() != ""))
+                            {
+                                empPriority.IssueNumber = row[1].ToString();
+                            }
+                            else
+                            {
+                                //required
+                                bValidRow = false;
+                                missingFieldList += (missingFieldList != "") ? ", " : "";
+                                missingFieldList += "Issue Number";
+                            }
+                            if ((row.Length >= 3) && (row[2].ToString() != ""))
+                            {
+                                empPriority.IssueSubject = row[2].ToString();
+                            }
+                            else
+                            {
+                                //required
+                                bValidRow = false;
+                                missingFieldList += (missingFieldList != "") ? ", " : "";
+                                missingFieldList += "Issue Subject";
+                            }
+                            if ((row.Length >= 4) && (row[3].ToString() != ""))
+                            {
+                                empPriority.Status = row[3].ToString();
+                            }
+                            else
+                            {
+                                //required
+                                bValidRow = false;
+                                missingFieldList += (missingFieldList != "") ? ", " : "";
+                                missingFieldList += "Issue Status";
+                            }
+                            if ((row.Length >= 5) && (row[4] != ""))
+                            {
+                                empPriority.Completed = row[4].ToString();
+                                int completed;
+                                if (Int32.TryParse(empPriority.Completed, out completed))
+                                {
+                                    if ((completed < 0) || (completed >100))
+                                    {
+                                        //invalid
+                                        bValidRow = false;
+                                        invalidFieldList += (invalidFieldList != "") ? ", " : "";
+                                        invalidFieldList += "% Completed(must be between 0 and 100)";
+                                    }
+                                }
+                                else
+                                {
+                                    //invalid
+                                    bValidRow = false;
+                                    invalidFieldList += (invalidFieldList != "") ? ", " : "";
+                                    invalidFieldList += "% Completed(must be an integer)";
+                                }
+                            }
+                            else
+                            {
+                                empPriority.Completed = "0";
+                            }
+                            if (row.Length >= 6)
+                            {
+                                empPriority.DevDueDate = row[5].ToString();
+                                DateTime devdue;
+                                string format = "MM/dd/yyyy";
+                                if (!DateTime.TryParseExact(empPriority.DevDueDate, format, CultureInfo.InvariantCulture,DateTimeStyles.None, out devdue))
+                                {
+                                    //invalid
+                                    bValidRow = false;
+                                    invalidFieldList += (invalidFieldList != "") ? ", " : "";
+                                    invalidFieldList += "Dev Due Date(must be in MM/DD/YYYY format)";
+                                }
+                            }
+                            else
+                            {
+                                empPriority.DevDueDate = "";
+                            }
+                            if (row.Length >= 7)
+                            {
+                                empPriority.QADueDate = row[6].ToString();
+                                DateTime qadue;
+                                string format = "MM/dd/yyyy";
+                                if (!DateTime.TryParseExact(empPriority.QADueDate, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out qadue))
+                                {
+                                    //invalid
+                                    bValidRow = false;
+                                    invalidFieldList += (invalidFieldList != "") ? ", " : "";
+                                    invalidFieldList += "QA Due Date(must be in MM/DD/YYYY format)";
+                                }
+                            }
+                            else
+                            {
+                                empPriority.QADueDate = "";
+                            }
+                            if (bValidRow)
+                            {
+                                string maxPriority = GetEmployeeMaxPriority(empPriority.EmployeeID);
+                                empPriority.Priority = ((maxPriority == "") ? 1 : Convert.ToInt32(maxPriority) + 1).ToString();
+                                empPriority.EnteredBy = empId;
+                                empPriority.AssignedBy = empId;
+                                AddPriority(empPriority);
+                                rowmessage = "Inserted Successfully.";
+                            }
+                            else
+                            {
+                                int errorCount = 0;
+                                if (missingFieldList != "")
+                                {
+                                    errorCount++;
+                                    rowmessage += (rowmessage == "") ? "Error(s) : " : " ";
+                                    rowmessage += errorCount + ". " + missingFieldMessage + missingFieldList;
+                                }
+                                if (invalidFieldList != "")
+                                {
+                                    errorCount++;
+                                    rowmessage += (rowmessage == "") ? "Error(s) : " : " ";
+                                    rowmessage += errorCount + ". " + invalidFieldMessage + invalidFieldList;
+                                }
+                            }
+                            report.RecordNo = recordRow;
+                            report.Message = rowmessage;
+                            report.Status = (bValidRow == true) ? "PASS" : "FAIL";
+                            uploadSummaryReport.Add(report);
+                            //rowmessage = "Record " + recordRow + ". " + rowmessage;
+                            //summary += (summary != "") ? ("<br/>" + rowmessage) : rowmessage;
+                        }
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                bUpload = false;
+                uploadSummaryReport = null;
+                message = e.Message;
+            }
+            return bUpload;
+        }
+
+        public static Employee GetEmployeeProfile(string empId)
+        {
+            Employee emp = null;
+            DataTable dtEmployee = GetEmployees(empId);
+            if (dtEmployee.Rows.Count > 0)
+            {
+                emp = new Employee();
+                emp.EmpID = dtEmployee.Rows[0]["EMPID"].ToString();
+                emp.EmployeeName = dtEmployee.Rows[0]["EMPNAME"].ToString();
+                emp.EmailId = dtEmployee.Rows[0]["EMAILID"].ToString();
+                emp.UserName = dtEmployee.Rows[0]["USERNAME"].ToString();
+                emp.IsManager = dtEmployee.Rows[0]["ISMANAGER"].ToString();
+            }
+            return emp;
         }
     }
 }

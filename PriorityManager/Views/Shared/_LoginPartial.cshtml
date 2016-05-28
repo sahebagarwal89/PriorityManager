@@ -1,0 +1,9 @@
+﻿@if (Session["fullname"] != null)
+{
+    <text>Welcome <a href="@Url.Action("EmployeeProfile", "Account", new { empId = Session["empid"] })">@Session["fullname"]</a></text>
+    <a href="@Url.Action("Logout", "Account")">Logout</a>
+}
+else
+{
+    
+}

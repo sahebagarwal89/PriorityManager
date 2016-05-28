@@ -39,6 +39,17 @@ a.editbutton
     text-indent: -9999px; /* hides the link text */
 }
 
+a.disableeditbutton
+{
+    background: url(../images/edit_16.png) no-repeat top left;
+    display: block;
+    width:16px;
+    height:16px;
+    text-indent: -9999px; /* hides the link text */
+    pointer-events: none;
+    opacity: 0.3;
+}
+
 a.viewbutton
 {
     background: url(../images/View.png) no-repeat top left;
@@ -57,6 +68,17 @@ a.addbutton
     text-indent: -9999px; /* hides the link text */
 }
 
+.disabledaddbutton 
+{
+    background: url(../images/addPriority.png) no-repeat top left;
+    display: block;
+    width:24px;
+    height:24px;
+    text-indent: -9999px; /* hides the link text */
+    pointer-events: none;
+    opacity: 0.3;
+}
+
 .deletebutton
 {
     background: url(../images/delete_16.png) no-repeat top left;
@@ -64,6 +86,17 @@ a.addbutton
     cursor:pointer;
     width:16px;
     height:16px;
+}
+
+.disabledeletebutton
+{
+    background: url(../images/delete_16.png) no-repeat top left;
+    display: block;
+    cursor:pointer;
+    width:16px;
+    height:16px;
+    pointer-events: none;
+    opacity: 0.3;
 }
 
 .assignbutton
@@ -75,18 +108,21 @@ a.addbutton
     height:16px;
 }
 
-.upArrow
+.disableassignbutton
 {
-    background: url(../images/uparrow_16.png) no-repeat top left;
+    background: url(../images/assignPriority.png) no-repeat top left;
     display: block;
     cursor:pointer;
     width:16px;
     height:16px;
+    pointer-events: none;
+    opacity: 0.3;
 }
 
-.downArrow
+
+.upArrow
 {
-    background: url(../images/downarrow_16.png) no-repeat top left;
+    background: url(../images/uparrow_16.png) no-repeat top left;
     display: block;
     cursor:pointer;
     width:16px;
@@ -102,6 +138,15 @@ a.addbutton
     height:16px;
 }
 
+.downArrow
+{
+    background: url(../images/downarrow_16.png) no-repeat top left;
+    display: block;
+    cursor:pointer;
+    width:16px;
+    height:16px;
+}
+
 .disabledownArrow
 {
     background: url(../images/downarrow_16_disabled.png) no-repeat top left;
@@ -109,17 +154,6 @@ a.addbutton
     cursor:pointer;
     width:16px;
     height:16px;
-}
-
-.disabledaddbutton 
-{
-    background: url(../images/addPriority.png) no-repeat top left;
-    display: block;
-    width:24px;
-    height:24px;
-    text-indent: -9999px; /* hides the link text */
-    pointer-events: none;
-    opacity: 0.3;
 }
 
 select,input,textarea{
@@ -264,7 +298,8 @@ textarea{
     function getEmployeePriority(empId)
     {
         //+ if no employee/all employees is selected Add Priority icon will be disabled.
-        if ((empId == "") || (empId == -1))
+        var IsManager = '@Session["ismanager"]';
+        if ((empId == "") || (empId == -1) || ((IsManager == "No") && (empId != '@Session["empid"]')))
         {
             $('#addPriority').prop("class", "disabledaddbutton");
             empId = (empId == "")? 0 : empId;
@@ -373,6 +408,9 @@ textarea{
         var counter=0;
         var sortedCol = $('#tblEmpPriority').dataTable().fnSettings().aaSorting[0][0];
         var sortedDir = $('#tblEmpPriority').dataTable().fnSettings().aaSorting[0][1];
+        var IsManager = '@Session["ismanager"]';
+        var sessionEmpId = '@Session["empid"]';
+        var empid = $('#Employees').val();
         $('#tblEmpPriority').DataTable(
         {
             destroy: true,
@@ -403,8 +441,11 @@ textarea{
                 {  "data": "DEVDUEDATE",
                     "render": function (devdue)
                     {
-                        var date = new Date(devdue);
-                        devdue = date.getMonth() + "/" + date.getDate() + "/" + date.getFullYear();
+                        if (devdue != "")
+                        {
+                            var date = new Date(devdue);
+                            devdue = date.getMonth()+1 + "/" + date.getDate() + "/" + date.getFullYear();
+                        }
                         return devdue;
                     },
                     "searchable":false,
@@ -414,8 +455,11 @@ textarea{
                 {  "data": "QADUEDATE",
                     "render": function (qadue)
                     {
-                        var date = new Date(qadue);
-                        qadue = date.getMonth() + "/" + date.getDate() + "/" + date.getFullYear();
+                        if (qadue != "")
+                        {
+                            var date = new Date(qadue);
+                            qadue = date.getMonth()+1 + "/" + date.getDate() + "/" + date.getFullYear();
+                        }
                         return qadue;
                     },
                     "searchable":false,
@@ -426,7 +470,7 @@ textarea{
                     "searchable": false,
                     "sortable": false,
                     "render": function (PID) {
-                        var empid = $('#Employees').val();
+                        //var empid = $('#Employees').val();
                         var result = '@Html.ActionLink("View", "ViewPriority", "EmployeePriority", new { @empId = "viewempid", @PID = "viewPID" }, new{@class="viewbutton", title="View Priority"})';
                         result = result.replace('viewempid', empid);
                         result = result.replace("viewPID", PID);
@@ -440,14 +484,15 @@ textarea{
                     "render": function (priority)
                     {
                         counter++;
-                        var empid = $('#Employees').val();
-                        if ((empid == "-1") ||(counter==totalPriority))
+                        //var empid = $('#Employees').val();
+                        var result = "";
+                        if ((empid == "-1") || (counter == totalPriority) || ((IsManager == "No") && (empid != sessionEmpId)))
                         {
-                            var result ='<span id="spnDownArrow_'+ empid + "_" + priority  + '" class="disabledownArrow"></span>';
+                            result ='<span id="spnDownArrow_'+ empid + "_" + priority  + '" class="disabledownArrow"></span>';
                         }
                         else
                         {
-                            var result ='<span title="Decrease Priority" id="spnDownArrow_'+ empid + "_" + priority  + '" onclick="decreasePriority(this,' + empid + "," + priority + ')" class="downArrow"></span>';
+                            result ='<span title="Decrease Priority" id="spnDownArrow_'+ empid + "_" + priority  + '" onclick="decreasePriority(this,' + empid + "," + priority + ')" class="downArrow"></span>';
                         }
                         return result;
                     }
@@ -458,14 +503,15 @@ textarea{
                     "sortable": false,
                     "render": function (priority)
                     {
-                        var empid = $('#Employees').val();
-                        if ((empid == "-1") || (counter==1))
+                        //var empid = $('#Employees').val();
+                        var result = "";
+                        if ((empid == "-1") || (counter == 1) || ((IsManager == "No") && (empid != sessionEmpId)))
                         {
-                            var result ='<span id="spnUpArrow_'+ empid + "_" + priority  + '" class="disableupArrow"></span>';
+                            result ='<span id="spnUpArrow_'+ empid + "_" + priority  + '" class="disableupArrow"></span>';
                         }
                         else
                         {
-                            var result ='<span title="Increase Priority" id="spnUpArrow_'+ empid + "_" + priority  + '" onclick="increasePriority(this,' + empid + "," + priority + ')" class="upArrow"></span>';
+                            result ='<span title="Increase Priority" id="spnUpArrow_'+ empid + "_" + priority  + '" onclick="increasePriority(this,' + empid + "," + priority + ')" class="upArrow"></span>';
                         }
 
                         return result;
@@ -477,8 +523,16 @@ textarea{
                     "sortable": false,
                     "render": function (PID)
                     {
-                        var empid = $('#Employees').val();
-                        var result = '@Html.ActionLink("Edit", "EditPriority", "EmployeePriority", new { @empId = "editempid", @PID = "editPID" }, new{@class="editbutton", title="Edit Priority"})';
+                        //var empid = $('#Employees').val();
+                        var result = "";
+                        if ((IsManager == "No") && (empid != sessionEmpId))
+                        {
+                            result = '@Html.ActionLink("Edit", "EditPriority", "EmployeePriority", new { @empId = "editempid", @PID = "editPID" }, new{@class="disableeditbutton", title="Edit Priority"})';
+                        }
+                        else
+                        {
+                            result = '@Html.ActionLink("Edit", "EditPriority", "EmployeePriority", new { @empId = "editempid", @PID = "editPID" }, new{@class="editbutton", title="Edit Priority"})';
+                        }
                         result = result.replace('editempid', empid);
                         result = result.replace("editPID", PID);
                         return result;
@@ -490,8 +544,16 @@ textarea{
                     "sortable": false,
                     "render": function (PID)
                     {
-                        var empid = $('#Employees').val();
-                        var result ='<span title="Delete Priority" id="spnDelEmpPriority_'+ PID  + '" onclick="deleteEmployeePriority(' + empid + "," + PID + ')" class="deletebutton"></span>';
+                        //var empid = $('#Employees').val();
+                        var result = "";
+                        if (IsManager == "Yes")
+                        {
+                            result = '<span title="Delete Priority" id="spnDelEmpPriority_' + PID + '" onclick="deleteEmployeePriority(' + empid + "," + PID + ')" class="deletebutton"></span>';
+                        }
+                        else
+                        {
+                            result = '<span title="Delete Priority" id="spnDelEmpPriority_' + PID + '" class="disabledeletebutton"></span>';
+                        }
                         return result;
                     }
                 },
@@ -500,7 +562,15 @@ textarea{
                     "searchable": false,
                     "sortable": false,
                     "render": function (PID) {
-                        var result = '<span title="Assign Priority" id="spnAssignEmpPriority_' + PID + '" onclick="assignEmployeePriority(this' + "," + PID + ')" class="assignbutton"></span>';
+                        var result = "";
+                        if ((IsManager == "No") && (empid != sessionEmpId))
+                        {
+                            result = '<span title="Assign Priority" id="spnAssignEmpPriority_' + PID + '" class="disableassignbutton"></span>';
+                        }
+                        else
+                        {
+                            result = '<span title="Assign Priority" id="spnAssignEmpPriority_' + PID + '" onclick="assignEmployeePriority(this' + "," + PID + ')" class="assignbutton"></span>';
+                        }
                         return result;
                     }
                 }
@@ -525,6 +595,8 @@ textarea{
     function redrawPriorityButton()
     {
         var empid = $('#Employees').val();
+        var IsManager = '@Session["ismanager"]';
+        var sessionEmpId = '@Session["empid"]';
         var totalRows = $("#tblEmpPriority > tbody > tr").length;
         for (var index=1;index<=totalRows;index++)
         {
@@ -534,7 +606,7 @@ textarea{
             var upArrowtd=row.children('td').eq(columns.INCREASE);
             var spnUpArrow="";
             var spnDownArrow ="";
-            if ((empid == "-1") || (totalRows==1))
+            if ((empid == "-1") || (totalRows == 1) || ((IsManager == "No") && (empid != sessionEmpId)))
             {
                 spnUpArrow ='<span id="spnUpArrow_'+ empid + "_" + priority  + '" class="disableupArrow"></span>';
                 spnDownArrow ='<span id="spnDownArrow_'+ empid + "_" + priority  + '" class="disabledownArrow"></span>';
@@ -573,7 +645,12 @@ textarea{
         <td>
             @Html.ActionLink("Add Priority", "AddPriority", null, new { @id = "addPriority", @class = "disabledaddbutton", title = "Add Priority" })
         </td>
-
+        <td>
+            @if (Session["ismanager"].ToString() == "Yes")
+            {
+                @Html.ActionLink("Upload Priorities", "UploadPriority", null, new { @id = "uploadPriority", @class = "duploadbutton", title = "Upload Priorities" })
+            }
+        </td>
     </tr>
 
 </table>

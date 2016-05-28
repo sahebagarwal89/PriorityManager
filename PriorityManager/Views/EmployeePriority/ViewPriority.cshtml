@@ -34,10 +34,6 @@
 
 <h2>View Priority</h2>
 
-@using (Html.BeginForm())
-{
-    @Html.ValidationSummary(true)
-
     <fieldset>
         <legend>ViewPriority</legend>
         <div>
@@ -57,7 +53,8 @@
                 <tr>
                     <td class="caption">@Html.LabelFor(model => model.EmployeeName)</td>
                     <td>
-                        @Html.DisplayFor(model => model.EmployeeName)
+                        @Html.ActionLink(Model.EmployeeName, "EmployeeProfile", "Account", new { @empId = Model.EmployeeID }, null)
+                        @*@Html.DisplayFor(model => model.EmployeeName)*@
                     </td>
                 </tr>
                 <tr>
@@ -76,6 +73,12 @@
                     <td class="caption">@Html.LabelFor(model => model.Status)</td>
                     <td>
                         @Html.DisplayFor(model => model.Status)
+                    </td>
+                </tr>
+                <tr>
+                    <td class="caption">@Html.LabelFor(model => model.Completed)</td>
+                    <td>
+                        @Html.DisplayFor(model => model.Completed)
                     </td>
                 </tr>
                 <tr>
@@ -117,7 +120,6 @@
             </table>
         </div>
     </fieldset>
-}
 
 <div>
     @Html.ActionLink("Back to List", "DisplayPriority", "EmployeePriority", new { @empId = Model.SelectedEMPID }, null)

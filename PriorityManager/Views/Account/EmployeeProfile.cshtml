@@ -1,0 +1,64 @@
+﻿@model PriorityManager.Models.Employee
+
+@{
+    ViewBag.Title = "EmployeeProfile";
+}
+
+<style type="text/css">
+
+    table, tr, td {
+        padding: 5px;
+        margin: 5px;
+    }
+
+    .caption {
+        text-align: right;
+    }
+</style>
+
+<h2>Employee Profile</h2>
+
+<fieldset>
+    <legend>Employee Profile</legend>
+    <div>
+        <table>
+            <tr>
+                <td class="caption">@Html.LabelFor(model => model.EmpID)</td>
+                <td>
+                    @Html.DisplayFor(model => model.EmpID)
+                </td>
+            </tr>
+            <tr>
+                <td class="caption">@Html.LabelFor(model => model.EmployeeName)</td>
+                <td>
+                    @Html.DisplayFor(model => model.EmployeeName)
+                </td>
+            </tr>
+            <tr>
+                <td class="caption">@Html.LabelFor(model => model.EmailId)</td>
+                <td>
+                    @Html.DisplayFor(model => model.EmailId)
+                </td>
+            </tr>
+            @if ((Session["empid"] != null) && (Session["empid"].ToString() == Model.EmpID))
+            {
+                <tr>
+                    <td class="caption">@Html.LabelFor(model => model.UserName)</td>
+                    <td>
+                        @Html.DisplayFor(model => model.UserName)
+                    </td>
+                </tr>
+            }
+            <tr>
+                <td class="caption">@Html.LabelFor(model => model.IsManager)</td>
+                <td>
+                    @Html.DisplayFor(model => model.IsManager)
+                </td>
+            </tr>            
+        </table>
+    </div>
+</fieldset>
+
+<div>
+    @Html.ActionLink("Back to List", "DisplayPriority", "EmployeePriority")
+</div>

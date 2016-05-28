@@ -10,9 +10,13 @@ using PriorityManager.BL;
 using System.Web.Script.Serialization;
 using PriorityManager.Models;
 using PriorityManager.ViewModels;
+using PriorityManager.Filters;
+using Microsoft.Reporting.WebForms;
+using System.IO;
 
 namespace PriorityManager.Controllers
 {
+    [CustomAuthorization]
     public class EmployeePriorityController : Controller
     {
         //
@@ -102,6 +106,7 @@ namespace PriorityManager.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult EditPriority(EmployeePriority empPriority)
         {
             if (ModelState.IsValid)
@@ -128,6 +133,7 @@ namespace PriorityManager.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult AddPriority(EmployeePriority empPriority)
         {
             if (ModelState.IsValid)
@@ -145,6 +151,112 @@ namespace PriorityManager.Controllers
             EmployeeDetails.AssignEmployeePriority(assignedBy, assignTo, pid, status,reason);
             EmployeeDetails.UpdateEmployeesFollowingPriority(empPriority.EmployeeID, Convert.ToInt32(empPriority.Priority));
             return GetEmployeePriority(empId);
+        }
+
+        public ActionResult UploadPriority()
+        {
+            List<UploadSummaryReport> uploadSummaryReport = null;
+            return View(uploadSummaryReport);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult UploadPriority(List<UploadSummaryReport> uploadSummaryReport, HttpPostedFileBase file)
+        {
+            Session.Remove("uploadReport");
+            uploadSummaryReport = null;
+            ViewBag.Message = null;
+            ViewBag.Summary = null;
+            if (file != null && file.ContentLength > 0)
+            {
+                if (file.FileName.EndsWith(".csv"))
+                {
+                    string message = "";
+                    string summary = "";
+                    bool bUpload = EmployeeDetails.UploadPriorityFile(file, Session["empid"].ToString(), ref message, ref summary, ref uploadSummaryReport);
+                    ViewBag.Summary = summary;
+                    if (bUpload)
+                    {
+                        ViewBag.Message = "Uploaded Successfully!";
+                        Session["uploadReport"] = uploadSummaryReport;
+                    }
+                    else
+                    {
+                        ViewBag.Message = message;
+                    }
+                    return View(uploadSummaryReport);
+                }
+                else
+                {
+                    ViewBag.Message = "This file format is not supported.";
+                    return View(uploadSummaryReport);
+                }
+            }
+            else
+            {
+                ViewBag.Message = "Please select the file to upload.";
+            }
+            return View(uploadSummaryReport);
+        }
+
+        public ActionResult GetReport(string id)
+        {
+            LocalReport lr = new LocalReport();
+            string path = Path.Combine(Server.MapPath("~/Reports"), "UploadSummaryReport.rdlc");
+            if (System.IO.File.Exists(path))
+            {
+                lr.ReportPath = path;
+            }
+            else
+            {
+                return View("UploadPriority");
+            }
+            DataTable dtUploadSummaryReport = new DataTable();
+            dtUploadSummaryReport.Columns.Add("RecordNo");
+            dtUploadSummaryReport.Columns.Add("Message");
+            dtUploadSummaryReport.Columns.Add("Status");
+            List<UploadSummaryReport> uploadSummaryReport = (List<UploadSummaryReport>)Session["uploadReport"];
+            foreach(UploadSummaryReport report in uploadSummaryReport)
+            {
+                dtUploadSummaryReport.Rows.Add(report.RecordNo,report.Message,report.Status);
+            }
+            ReportDataSource rd = new ReportDataSource("UploadSummaryDataSet", dtUploadSummaryReport);
+            lr.DataSources.Add(rd);
+            string reportType = id;
+            string mimeType;
+            string encoding;
+            string fileNameExtension;
+
+
+
+            string deviceInfo =
+
+            "<DeviceInfo>" +
+            "  <OutputFormat>" + id + "</OutputFormat>" +
+            "  <PageWidth>8.5in</PageWidth>" +
+            "  <PageHeight>11in</PageHeight>" +
+            "  <MarginTop>0.5in</MarginTop>" +
+            "  <MarginLeft>1in</MarginLeft>" +
+            "  <MarginRight>1in</MarginRight>" +
+            "  <MarginBottom>0.5in</MarginBottom>" +
+            "</DeviceInfo>";
+
+            Warning[] warnings;
+            string[] streams;
+            byte[] renderedBytes;
+            renderedBytes = lr.Render(
+                reportType,
+                deviceInfo,
+                out mimeType,
+                out encoding,
+                out fileNameExtension,
+                out streams,
+                out warnings);
+            if (id=="Image")
+            {
+                mimeType = "image/TIFF";
+            }
+            return File(renderedBytes, mimeType);
         }
     }
 }

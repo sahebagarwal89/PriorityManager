@@ -1,0 +1,61 @@
+﻿@model PriorityManager.Models.LoginModel
+
+@{
+    ViewBag.Title = "Log in";
+}
+
+<hgroup class="title">
+    <h1>@ViewBag.Title.</h1>
+</hgroup>
+
+<section id="loginForm">
+
+@using (Html.BeginForm("Login","Account", new { returnUrl = @ViewBag.returnUrl}, FormMethod.Post,null))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+
+    <fieldset>
+        <legend>Log in Form</legend>
+        @if(ViewBag.Error != null)
+        {
+            <p>@ViewBag.Error</p>
+        }
+        <div>
+            <table>
+                <tr>
+                    <td>@Html.LabelFor(model => model.UserName)</td>
+                    <td>
+                        @Html.TextBoxFor(model => model.UserName)
+                        @Html.ValidationMessageFor(m => m.UserName)
+                    </td>
+                </tr>
+                <tr>
+                    <td>@Html.LabelFor(m => m.Password)</td>
+                    <td>
+                        @Html.PasswordFor(m => m.Password)
+                        @Html.ValidationMessageFor(m => m.Password)
+                    </td>
+                </tr>
+                <tr>
+                    <td>@Html.CheckBoxFor(m => m.RememberMe)</td>
+                    <td>
+                        @Html.LabelFor(m => m.RememberMe)
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <input type="submit" value="Log in" />
+                    </td>
+
+                </tr>
+            </table>
+        </div>
+
+                
+    </fieldset>
+    <p>
+        @Html.ActionLink("Register", "Register") if you don't have an account.
+    </p>
+}
+</section>

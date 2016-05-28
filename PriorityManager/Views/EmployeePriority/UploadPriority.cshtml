@@ -1,0 +1,68 @@
+﻿@model List<PriorityManager.ViewModels.UploadSummaryReport>
+@{
+    ViewBag.Title = "UploadPriority";
+}
+
+<h2>UploadPriority</h2>
+<section id="uploadForm">
+
+    @using (Html.BeginForm("UploadPriority", "EmployeePriority", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+        
+        <div>
+            @if (ViewBag.Message != null)
+            {
+                <p>@ViewBag.Message</p>
+            }
+            <table>
+                <tr>
+                    <td>
+                        Select the file to upload priority
+                    </td>
+                    <td>
+                        @Html.TextBox("file", null, new { @type="file"})
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <input type="submit" value="Upload" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div>
+            @if (Model != null)
+            {
+                <h2>Upload Summary Report</h2>
+
+                <table>
+                    <tr>
+                        <th>Record #</th>
+                        <th>Message</th>
+                        <th>Status</th>
+                    </tr>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@Html.DisplayFor(modelItem => item.RecordNo)</td>
+                            <td>@Html.DisplayFor(modelItem => item.Message)</td>
+                            <td>@Html.DisplayFor(modelItem => item.Status)</td>
+                        </tr>
+                    }
+                </table>
+                <div style="padding:10px; border:1px solid black">
+                    <div><a href="@Url.Action("GetReport",new {id= "PDF"})"> Get Report PDF</a></div>
+                    <div><a href="@Url.Action("GetReport",new {id= "Excel"})"> Get Report Excel</a></div>
+                    <div><a href="@Url.Action("GetReport",new {id= "Word"})"> Get Report Word</a></div>
+                    <div><a href="@Url.Action("GetReport",new {id= "Image"})"> Get Report Image</a></div>
+                </div>
+            }
+        </div>
+    }
+</section>
+
+
+
+
+

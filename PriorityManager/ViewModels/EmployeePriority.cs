@@ -21,10 +21,16 @@ namespace PriorityManager.ViewModels
         [Required(ErrorMessage = "{0} is Required.")]
         [Display(Name = "Issue Subject")]
         public string IssueSubject { get; set; }
-        [Display(Name = "Status")]
+        [Required(ErrorMessage = "{0} is Required.")]
+        [Display(Name = "Issue Status")]
         public string Status { get; set; }
+        [Display(Name = "% Complete")]
+        [Range(0,100)]
+        public string Completed { get; set; }
+        [RegularExpression("^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)[0-9][0-9]$", ErrorMessage = "{0} must be in MM/DD/YYYY format.")]
         [Display(Name = "Dev Due Data")]
         public string DevDueDate { get; set; }
+        [RegularExpression("^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)[0-9][0-9]$", ErrorMessage = "{0} must be in MM/DD/YYYY format.")]
         [Display(Name = "QA Due Date")]
         public string QADueDate { get; set; }
         [Display(Name = "Priority")]

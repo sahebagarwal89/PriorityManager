@@ -5,8 +5,10 @@
 }
 <script src="@Url.Content("~/Scripts/jquery-1.12.3.js")"></script>
 <script src="@Url.Content("~/Scripts/ui/jquery-ui.js")"></script>
+<script src="@Url.Content("~/Scripts/bootstrap.js")"></script>
 <link rel="stylesheet" href="@Url.Content("~/Styles/jquery-ui.css")"></link>
 <link rel="stylesheet" href="@Url.Content("~/Styles/theme.css")"></link>
+<link rel="stylesheet" href="@Url.Content("~/Styles/bootstrap.css")"></link>
 <style type="text/css">
 
 .hide
@@ -45,7 +47,9 @@
 
 <h2>Edit Priority</h2>
 
-@using (Html.BeginForm()) {
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
     @Html.ValidationSummary(true)
 
     <fieldset>
@@ -53,71 +57,85 @@
         <div>
             <table>
                 <tr class="hide">
-                    <td>Selected EMPID</td>
+                    <td>@Html.LabelFor(model => model.SelectedEMPID)</td>
                     <td>
                         @Html.EditorFor(model => model.SelectedEMPID)
                     </td>
                 </tr>
                 <tr class="hide">
-                    <td>Employee ID</td>
+                    <td>@Html.LabelFor(model => model.EmployeeID)</td>
                     <td>
                         @Html.EditorFor(model => model.EmployeeID)
                     </td>
                 </tr>
                 <tr>
-                    <td>Employee Name</td>
+                    <td>@Html.LabelFor(model => model.EmployeeName)</td>
                     <td>
                         @Html.EditorFor(model => model.EmployeeName)
                         @Html.ValidationMessageFor(model => model.EmployeeName)
                     </td>
                 </tr>
                 <tr>
-                    <td>Issue #</td>
+                    <td>@Html.LabelFor(model => model.IssueNumber)</td>
                     <td>
                         @Html.EditorFor(model => model.IssueNumber)
                         @Html.ValidationMessageFor(model => model.IssueNumber)
                     </td>
                 </tr>
                 <tr>
-                    <td>Subject</td>
+                    <td>@Html.LabelFor(model => model.IssueSubject)</td>
                     <td>
                         @Html.EditorFor(model => model.IssueSubject)
                         @Html.ValidationMessageFor(model => model.IssueSubject)
                     </td>
                 </tr>
                 <tr>
-                    <td>Dev Due Date</td>
+                    <td>@Html.LabelFor(model => model.Status)</td>
+                    <td>
+                        @Html.EditorFor(model => model.Status)
+                        @Html.ValidationMessageFor(model => model.Status)
+                    </td>
+                </tr>
+                <tr>
+                    <td>@Html.LabelFor(model => model.Completed)</td>
+                    <td>
+                        @Html.EditorFor(model => model.Completed)
+                        @Html.ValidationMessageFor(model => model.Completed)
+                    </td>
+                </tr>
+                <tr>
+                    <td>@Html.LabelFor(model => model.DevDueDate)</td>
                     <td>
                         @Html.EditorFor(model => model.DevDueDate)
                         @Html.ValidationMessageFor(model => model.DevDueDate)
                     </td>
                 </tr>
                 <tr>
-                    <td>QA Due Date</td>
+                    <td>@Html.LabelFor(model => model.QADueDate)</td>
                     <td>
                         @Html.EditorFor(model => model.QADueDate)
                         @Html.ValidationMessageFor(model => model.QADueDate)
                     </td>
                 </tr>
                 <tr>
-                    <td>Priority</td>
+                    <td>@Html.LabelFor(model => model.Priority)</td>
                     <td>
                         @Html.EditorFor(model => model.Priority)
                         @Html.ValidationMessageFor(model => model.Priority)
                     </td>
                 </tr>
                 <tr>
-                    <td colspan="2">
-                        <input type="submit" value="Save" />
+                    <td colspan="2" align="center" style="padding:5px;">
+                        <input class="btn-xs btn-primary" type="submit" value="Save" />
                     </td>
                 </tr>
             </table>
         </div>
     </fieldset>
 }
-
+<br/>
 <div>
-    @Html.ActionLink("Back to List", "DisplayPriority","EmployeePriority", new { @empId = Model.SelectedEMPID },null)
+    @Html.ActionLink("Back to List", "DisplayPriority","EmployeePriority", new { @empId = Model.SelectedEMPID }, new { @class="btn-sm btn-danger"})
 </div>
 
  
